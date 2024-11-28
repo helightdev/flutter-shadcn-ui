@@ -21,37 +21,47 @@ void main() {
           tabs: const [
             ColorPickerTab(
               title: 'HSL',
-              colorPicker: true,
-              hueSlider: true,
-              alphaSlider: true,
-              hexField: true,
-              hslRow: true,
+              features: {
+                ShadColorPickerFeature.colorPicker,
+                ShadColorPickerFeature.hueSlider,
+                ShadColorPickerFeature.alphaSlider,
+                ShadColorPickerFeature.hexField,
+                ShadColorPickerFeature.hslRow,
+              },
             ),
             ColorPickerTab(
               title: 'RGB',
-              colorPicker: true,
-              hueSlider: true,
-              alphaSlider: true,
-              hexField: true,
-              rgbRow: true,
+              features: {
+                ShadColorPickerFeature.colorPicker,
+                ShadColorPickerFeature.rgbSliders,
+                ShadColorPickerFeature.alphaSlider,
+                ShadColorPickerFeature.hexField,
+                ShadColorPickerFeature.rgbRow,
+              },
             ),
             ColorPickerTab(
               title: 'VisHSL',
-              colorPicker: true,
-              hueSlider: true,
-              saturationSlider: true,
-              luminanceSlider: true,
-              alphaSlider: true,
+              features: {
+                ShadColorPickerFeature.colorPicker,
+                ShadColorPickerFeature.hueSlider,
+                ShadColorPickerFeature.saturationSlider,
+                ShadColorPickerFeature.luminanceSlider,
+                ShadColorPickerFeature.alphaSlider,
+                ShadColorPickerFeature.hexField,
+                ShadColorPickerFeature.hslRow,
+              },
               sliderStyle: ComponentEditorStyle.sliderLabel,
-              hexField: true,
             ),
             ColorPickerTab(
               title: 'VisRGB',
-              colorPicker: true,
-              rgbSliders: true,
-              alphaSlider: true,
+              features: {
+                ShadColorPickerFeature.colorPicker,
+                ShadColorPickerFeature.rgbSliders,
+                ShadColorPickerFeature.alphaSlider,
+                ShadColorPickerFeature.hexField,
+                ShadColorPickerFeature.rgbRow,
+              },
               sliderStyle: ComponentEditorStyle.sliderLabel,
-              hexField: true,
             ),
           ],
           controller: controller,
@@ -108,17 +118,23 @@ void main() {
                         },
                         child: Row(
                           children: [
-                            Text('#${controller.color.value.toRadixString(16)}'),
+                            Text(
+                                '#${controller.color.value.toRadixString(16)}'),
                             const SizedBox(width: 8),
                             ValueListenableBuilder(
                               valueListenable: controller,
                               builder: (context, value, _) {
-                                return Container(
+                                return SizedBox(
                                   width: 16,
                                   height: 16,
-                                  decoration: BoxDecoration(
-                                    color: controller.color,
-                                    borderRadius: BorderRadius.circular(4),
+                                  child: CustomPaint(
+                                    painter: ColorPreviewPainter(
+                                      color: value.toColor(),
+                                      radius: BorderRadius.circular(4),
+                                      checkerboard: true,
+                                      showAlpha: true,
+                                      shadows: ShadShadows.sm,
+                                    ),
                                   ),
                                 );
                               },
@@ -160,9 +176,9 @@ void main() {
 }
 
 class ColorPickerTabView extends StatefulWidget {
-
   const ColorPickerTabView(
       {super.key, required this.tabs, required this.controller});
+
   final List<ColorPickerTab> tabs;
   final ShadColorPickerController controller;
 
@@ -206,36 +222,32 @@ class _ColorPickerTabViewState extends State<ColorPickerTabView> {
   }
 }
 
-class ColorPickerTab {
+enum ShadColorPickerFeature {
+  colorPicker,
+  hueSlider,
+  alphaSlider,
+  saturationSlider,
+  luminanceSlider,
+  rgbSliders,
+  hexField,
+  rgbRow,
+  hslRow;
+}
 
+class ColorPickerTab {
   const ColorPickerTab({
     required this.title,
-    this.colorPicker = false,
-    this.hueSlider = false,
-    this.alphaSlider = false,
-    this.saturationSlider = false,
-    this.luminanceSlider = false,
-    this.rgbSliders = false,
-    this.hexField = false,
-    this.rgbRow = false,
-    this.hslRow = false,
+    required this.features,
     this.sliderStyle = ComponentEditorStyle.slider,
   });
+
   final String title;
-  final bool colorPicker;
-  final bool hueSlider;
-  final bool alphaSlider;
-  final bool saturationSlider;
-  final bool luminanceSlider;
-  final bool rgbSliders;
-  final bool hexField;
-  final bool rgbRow;
-  final bool hslRow;
+  final Set<ShadColorPickerFeature> features;
   final ComponentEditorStyle sliderStyle;
 
   Widget build(ShadColorPickerController controller) {
     return IntrinsicHeight(
-      child: switch (colorPicker) {
+      child: switch (features.contains(ShadColorPickerFeature.colorPicker)) {
         true => Row(
             children: [
               Expanded(
@@ -262,25 +274,25 @@ class ColorPickerTab {
   Widget buildSidebar(ShadColorPickerController controller) {
     return Column(
       children: [
-        if (hueSlider)
+        if (features.contains(ShadColorPickerFeature.hueSlider))
           HSLComponentSlider(
             component: HSLComponent.hue,
             controller: controller,
             style: sliderStyle,
           ),
-        if (saturationSlider)
+        if (features.contains(ShadColorPickerFeature.saturationSlider))
           HSLComponentSlider(
             component: HSLComponent.saturation,
             controller: controller,
             style: sliderStyle,
           ),
-        if (luminanceSlider)
+        if (features.contains(ShadColorPickerFeature.luminanceSlider))
           HSLComponentSlider(
             component: HSLComponent.lightness,
             controller: controller,
             style: sliderStyle,
           ),
-        if (rgbSliders) ...[
+        if (features.contains(ShadColorPickerFeature.rgbSliders)) ...[
           RGBComponentSlider(
             component: RGBComponent.red,
             controller: controller,
@@ -297,17 +309,26 @@ class ColorPickerTab {
             style: sliderStyle,
           ),
         ],
-        if (alphaSlider)
+        if (features.contains(ShadColorPickerFeature.alphaSlider))
           HSLComponentSlider(
             component: HSLComponent.alpha,
             controller: controller,
             style: sliderStyle,
           ),
-        if (hueSlider || alphaSlider || saturationSlider || luminanceSlider)
+        if (features.intersection({
+          ShadColorPickerFeature.hueSlider,
+          ShadColorPickerFeature.alphaSlider,
+          ShadColorPickerFeature.saturationSlider,
+          ShadColorPickerFeature.luminanceSlider,
+        }).isNotEmpty)
           const Spacer(),
-        if (hexField) HexComponentInput(controller: controller),
-        if (hexField && (rgbRow || hslRow)) const SizedBox(height: 16),
-        if (rgbRow)
+        if (features.contains(ShadColorPickerFeature.hexField))
+          HexComponentInput(controller: controller),
+        if (features.contains(ShadColorPickerFeature.hexField) &&
+            (features.contains(ShadColorPickerFeature.rgbRow) ||
+                features.contains(ShadColorPickerFeature.hslRow)))
+          const SizedBox(height: 8),
+        if (features.contains(ShadColorPickerFeature.rgbRow))
           Row(
             children: [
               Flexible(
@@ -330,7 +351,7 @@ class ColorPickerTab {
               ),
             ],
           ),
-        if (hslRow)
+        if (features.contains(ShadColorPickerFeature.hslRow))
           Row(
             children: [
               Flexible(
@@ -709,8 +730,8 @@ enum RGBComponent {
 }
 
 class HexComponentInput extends StatelessWidget {
-
   const HexComponentInput({super.key, required this.controller});
+
   final ShadColorPickerController controller;
 
   static String toHex(Color color) {
@@ -732,42 +753,30 @@ class HexComponentInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4),
-          child: Text(
-            'Hex',
-            style: ShadTheme.of(context).textTheme.small,
-          ),
-        ),
-        ValueListenableBuilder(
-          valueListenable: controller,
-          builder: (context, value, _) {
-            return ShadInput(
-              controller: TextEditingController(text: toHex(value.toColor())),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp('^#?[0-9a-fA-F]*')),
-                LengthLimitingTextInputFormatter(9),
-              ],
-              onSubmitted: (text) {
-                final parsed = fromHex(text);
-                if (parsed == null) return;
-                controller.value = HSLColor.fromColor(parsed);
-              },
-              // suffix: Container(
-              //   width: 16,
-              //   height: 16,
-              //   decoration: BoxDecoration(
-              //     color: controller.color,
-              //     borderRadius: BorderRadius.circular(4),
-              //   ),
-              // ),
-            );
+    return ValueListenableBuilder(
+      valueListenable: controller,
+      builder: (context, value, _) {
+        return ShadInput(
+          controller: TextEditingController(text: toHex(value.toColor())),
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp('^#?[0-9a-fA-F]*')),
+            LengthLimitingTextInputFormatter(9),
+          ],
+          onSubmitted: (text) {
+            final parsed = fromHex(text);
+            if (parsed == null) return;
+            controller.value = HSLColor.fromColor(parsed);
           },
-        ),
-      ],
+          // suffix: Container(
+          //   width: 16,
+          //   height: 16,
+          //   decoration: BoxDecoration(
+          //     color: controller.color,
+          //     borderRadius: BorderRadius.circular(4),
+          //   ),
+          // ),
+        );
+      },
     );
   }
 }
@@ -925,7 +934,6 @@ class _HSLComponentSliderState extends State<HSLComponentSlider> {
 }
 
 class RGBComponentSlider extends StatefulWidget {
-
   const RGBComponentSlider({
     Key? key,
     required this.component,
@@ -1091,6 +1099,76 @@ class GradientTrackPainter extends CustomPainter {
   bool shouldRepaint(covariant GradientTrackPainter oldDelegate) {
     return oldDelegate.gradient != gradient ||
         oldDelegate.checkerboard != checkerboard;
+  }
+}
+
+class ColorPreviewPainter extends CustomPainter {
+  const ColorPreviewPainter({
+    required this.color,
+    required this.radius,
+    required this.checkerboard,
+    required this.showAlpha,
+    required this.shadows,
+  });
+
+  final Color color;
+  final BorderRadius radius;
+  final bool checkerboard;
+  final bool showAlpha;
+  final List<BoxShadow> shadows;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final rounded = radius.toRRect(rect);
+
+    for (final shadow in shadows) {
+      canvas.drawRRect(
+        rounded.shift(shadow.offset).inflate(shadow.spreadRadius),
+        Paint()
+          ..color = shadow.color
+          ..maskFilter = MaskFilter.blur(shadow.blurStyle, shadow.blurSigma),
+      );
+    }
+
+    if (checkerboard && color.alpha < 255) {
+      canvas.clipRRect(rounded);
+
+      final quadHeight = rect.height / 2;
+      const evenColor = Color(0xFFE0E0E0);
+      const oddColor = Color(0xFFB0B0B0);
+
+      final xCount = (rect.width / quadHeight).ceil();
+
+      for (var x = 0; x < xCount; x++) {
+        for (var y = 0; y < 2; y++) {
+          final color = (x + y).isEven ? evenColor : oddColor;
+          final r = Rect.fromLTWH(
+            x * quadHeight + rect.left,
+            y * quadHeight + rect.top,
+            quadHeight,
+            quadHeight,
+          );
+          canvas.drawRect(r, Paint()..color = color);
+        }
+      }
+    }
+
+    final paint = Paint()
+      ..color = switch (showAlpha) {
+        true => color,
+        false => color.withOpacity(1),
+      }
+      ..style = PaintingStyle.fill;
+    canvas.drawRRect(rounded, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant ColorPreviewPainter oldDelegate) {
+    return oldDelegate.color != color ||
+        oldDelegate.checkerboard != checkerboard ||
+        oldDelegate.showAlpha != showAlpha ||
+        oldDelegate.radius != radius;
   }
 }
 
