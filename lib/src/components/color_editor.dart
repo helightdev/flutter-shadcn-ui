@@ -49,23 +49,6 @@ class ShadColorEditor extends StatefulWidget {
 
   final ValueChanged<Color>? onChanged;
 
-  static String colorToHex(Color color) {
-    var hex = color.value.toRadixString(16).padLeft(8, '0');
-    if (hex.startsWith('ff')) {
-      hex = hex.substring(2);
-    }
-    return '#$hex';
-  }
-
-  static Color? colorFromHex(String hex) {
-    var trimmed = hex.replaceAll('#', '');
-    if (trimmed.length == 6) {
-      trimmed = 'ff$hex';
-    }
-    final parsed = int.tryParse(trimmed, radix: 16);
-    return parsed != null ? Color(parsed) : null;
-  }
-
   @override
   State<ShadColorEditor> createState() => _ShadColorEditorState();
 }
@@ -90,8 +73,12 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
       type: MaterialType.transparency,
       child: ShadTheme(
         data: theme.copyWith(
-          tabsTheme: widget.tabsTheme ?? theme.colorEditorTheme.tabsTheme,
-          sliderTheme: widget.sliderTheme ?? theme.colorEditorTheme.sliderTheme,
+          tabsTheme: theme.tabsTheme.mergeWith(
+            widget.tabsTheme ?? theme.colorEditorTheme.tabsTheme,
+          ),
+          sliderTheme: theme.sliderTheme.mergeWith(
+            widget.sliderTheme ?? theme.colorEditorTheme.sliderTheme,
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -120,7 +107,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
                   },
                 ),
               ),
-            buildTab(widget.tabs[currentIndex])
+            buildTab(widget.tabs[currentIndex]),
           ],
         ),
       ),
@@ -297,7 +284,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
               style: sliderStyle,
               sliderLabelStyle: effectiveSliderLabelStyle,
               sliderLabelPadding: effectiveSliderLabelPadding,
-            )
+            ),
           ],
         );
       case ShadColorPickerFeature.hexField:
@@ -688,7 +675,7 @@ enum HSLComponent {
               HSLColor.fromAHSL(0, color.hue, color.saturation, color.lightness)
                   .toColor(),
               HSLColor.fromAHSL(1, color.hue, color.saturation, color.lightness)
-                  .toColor()
+                  .toColor(),
             ],
           ),
       };
@@ -769,7 +756,7 @@ class ShadHexComponentInput extends StatelessWidget {
       builder: (context, value, _) {
         return ShadInput(
           controller: TextEditingController(
-            text: ShadColorEditor.colorToHex(value.toColor()),
+            text: colorToHex(value.toColor()),
           ),
           inputFormatters: switch (controller.transparency) {
             true => [
@@ -782,7 +769,7 @@ class ShadHexComponentInput extends StatelessWidget {
               ],
           },
           onSubmitted: (text) {
-            final parsed = ShadColorEditor.colorFromHex(text);
+            final parsed = colorFromHex(text);
             if (parsed == null) return;
             controller.value = HSLColor.fromColor(parsed);
             onChanged?.call(controller.value.toColor());
@@ -1248,29 +1235,31 @@ class GradientTrackPainter extends CustomPainter {
     if (avgLuminance > 0.5 && theme.brightness == Brightness.light) {
       final lerp = (avgLuminance - 0.5) / 0.5;
       _paintBoxShadows(
-          canvas,
-          rounded,
-          [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              offset: const Offset(0, 1),
-              blurRadius: 2,
-            ),
-          ],
-          opacity: lerp);
+        canvas,
+        rounded,
+        [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            offset: const Offset(0, 1),
+            blurRadius: 2,
+          ),
+        ],
+        opacity: lerp,
+      );
     } else if (avgLuminance < 0.5 && theme.brightness == Brightness.dark) {
       final lerp = (0.5 - avgLuminance) / 0.5;
       _paintBoxShadows(
-          canvas,
-          rounded,
-          [
-            BoxShadow(
-              color: Colors.white.withOpacity(0.1),
-              offset: const Offset(0, 1),
-              blurRadius: 2,
-            ),
-          ],
-          opacity: lerp);
+        canvas,
+        rounded,
+        [
+          BoxShadow(
+            color: Colors.white.withOpacity(0.1),
+            offset: const Offset(0, 1),
+            blurRadius: 2,
+          ),
+        ],
+        opacity: lerp,
+      );
     }
 
     if (checkerboard) {
@@ -1375,6 +1364,23 @@ class ColorPreviewPainter extends CustomPainter {
 }
 
 //<editor-fold desc="Utils">
+String colorToHex(Color color) {
+  var hex = color.value.toRadixString(16).padLeft(8, '0');
+  if (hex.startsWith('ff')) {
+    hex = hex.substring(2);
+  }
+  return '#$hex';
+}
+
+Color? colorFromHex(String hex) {
+  var trimmed = hex.replaceAll('#', '');
+  if (trimmed.length == 6) {
+    trimmed = 'ff$hex';
+  }
+  final parsed = int.tryParse(trimmed, radix: 16);
+  return parsed != null ? Color(parsed) : null;
+}
+
 final LinearGradient _hlsHueGradient = _sampleGradient(
   360,
   (time) => HSLColor.fromAHSL(1, time * 360, 1, 0.5).toColor(),

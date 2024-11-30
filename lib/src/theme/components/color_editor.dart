@@ -95,8 +95,14 @@ class ShadColorEditorTheme {
       inputStyle: other.inputStyle,
       inputSuffixStyle: other.inputSuffixStyle,
       inputDecoration: other.inputDecoration,
-      tabsTheme: other.tabsTheme,
-      sliderTheme: other.sliderTheme,
+      tabsTheme: switch(other.tabsTheme) {
+        null => tabsTheme,
+        final value => tabsTheme?.mergeWith(value),
+      },
+      sliderTheme: switch(other.sliderTheme) {
+        null => sliderTheme,
+        final value => sliderTheme?.mergeWith(value),
+      },
     );
   }
 

@@ -943,7 +943,6 @@ class ShadDefaultThemeNoSecondaryBorderVariant extends ShadThemeVariant {
       sliderLabelStyle: effectiveTextTheme.small,
       inputLabelPadding: const EdgeInsets.only(left: 4),
       sliderLabelPadding: const EdgeInsets.only(left: 4),
-      tabsTheme: tabsTheme(),
     );
   }
 }

@@ -1,12 +1,7 @@
-import 'dart:math';
-import 'dart:ui';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
-import 'color_editor.dart';
 
 class ShadColorPicker extends StatefulWidget {
   const ShadColorPicker({
@@ -75,7 +70,7 @@ class _ShadColorPickerState extends State<ShadColorPicker> {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(ShadColorEditor.colorToHex(controller.value.toColor())),
+                  Text(colorToHex(controller.value.toColor())),
                   SizedBox(
                     width: 16,
                     height: 16,
