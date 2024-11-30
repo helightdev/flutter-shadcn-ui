@@ -16,6 +16,7 @@ import 'package:shadcn_ui/src/theme/components/button.dart';
 import 'package:shadcn_ui/src/theme/components/calendar.dart';
 import 'package:shadcn_ui/src/theme/components/card.dart';
 import 'package:shadcn_ui/src/theme/components/checkbox.dart';
+import 'package:shadcn_ui/src/theme/components/color_editor.dart';
 import 'package:shadcn_ui/src/theme/components/context_menu.dart';
 import 'package:shadcn_ui/src/theme/components/date_picker.dart';
 import 'package:shadcn_ui/src/theme/components/decorator.dart';
@@ -876,6 +877,33 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
           radius: radius,
         ),
       ),
+    );
+  }
+
+  @override
+  ShadColorEditorTheme colorEditorTheme() {
+    return ShadColorEditorTheme(
+      columnSpacing: 8,
+      rowSpacing: 8,
+      mainRowSpacing: 16,
+      inputDecoration: ShadDecoration(
+        border: ShadBorder.all(
+          width: 2,
+          color: colorScheme.border,
+          radius: radius,
+        ),
+      ),
+      tabsPadding: const EdgeInsets.only(bottom: 8, left: 4, right: 4, top: 4),
+      tabLabelStyle: effectiveTextTheme.small,
+      inputStyle:
+          effectiveTextTheme.muted.copyWith(color: colorScheme.foreground),
+      inputLabelStyle: effectiveTextTheme.small,
+      inputSuffixStyle: effectiveTextTheme.muted,
+      sliderLabelStyle: effectiveTextTheme.small,
+      inputLabelPadding: const EdgeInsets.only(left: 4),
+      sliderLabelPadding: const EdgeInsets.only(left: 4),
+      tabsTheme: tabsTheme(),
+      sliderTheme: sliderTheme(),
     );
   }
 }

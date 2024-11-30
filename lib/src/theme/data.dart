@@ -10,6 +10,7 @@ import 'package:shadcn_ui/src/theme/components/button.dart';
 import 'package:shadcn_ui/src/theme/components/calendar.dart';
 import 'package:shadcn_ui/src/theme/components/card.dart';
 import 'package:shadcn_ui/src/theme/components/checkbox.dart';
+import 'package:shadcn_ui/src/theme/components/color_editor.dart';
 import 'package:shadcn_ui/src/theme/components/context_menu.dart';
 import 'package:shadcn_ui/src/theme/components/date_picker.dart';
 import 'package:shadcn_ui/src/theme/components/decorator.dart';
@@ -84,6 +85,7 @@ class ShadThemeData extends ShadBaseTheme {
     bool? disableSecondaryBorder,
     ShadTabsTheme? tabsTheme,
     ShadThemeVariant? variant,
+    ShadColorEditorTheme? colorEditorTheme,
     ShadContextMenuTheme? contextMenuTheme,
     ShadCalendarTheme? calendarTheme,
     ShadDatePickerTheme? datePickerTheme,
@@ -229,6 +231,8 @@ class ShadThemeData extends ShadBaseTheme {
           effectiveVariant.datePickerTheme().mergeWith(datePickerTheme),
       timePickerTheme:
           effectiveVariant.timePickerTheme().mergeWith(timePickerTheme),
+      colorEditorTheme:
+          effectiveVariant.colorEditorTheme().mergeWith(colorEditorTheme),
     );
   }
 
@@ -277,6 +281,7 @@ class ShadThemeData extends ShadBaseTheme {
     required super.hoverStrategies,
     required super.disableSecondaryBorder,
     required super.tabsTheme,
+    required super.colorEditorTheme,
     required super.contextMenuTheme,
     required super.calendarTheme,
     required super.datePickerTheme,

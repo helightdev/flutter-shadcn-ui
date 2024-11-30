@@ -8,6 +8,7 @@ import 'package:shadcn_ui/src/theme/components/button.dart';
 import 'package:shadcn_ui/src/theme/components/calendar.dart';
 import 'package:shadcn_ui/src/theme/components/card.dart';
 import 'package:shadcn_ui/src/theme/components/checkbox.dart';
+import 'package:shadcn_ui/src/theme/components/color_editor.dart';
 import 'package:shadcn_ui/src/theme/components/context_menu.dart';
 import 'package:shadcn_ui/src/theme/components/date_picker.dart';
 import 'package:shadcn_ui/src/theme/components/decorator.dart';
@@ -78,6 +79,7 @@ abstract class ShadBaseTheme {
     required this.hoverStrategies,
     required this.disableSecondaryBorder,
     required this.tabsTheme,
+    required this.colorEditorTheme,
     required this.contextMenuTheme,
     required this.calendarTheme,
     required this.datePickerTheme,
@@ -128,6 +130,7 @@ abstract class ShadBaseTheme {
   final ShadHoverStrategies hoverStrategies;
   final bool disableSecondaryBorder;
   final ShadTabsTheme tabsTheme;
+  final ShadColorEditorTheme colorEditorTheme;
   final ShadContextMenuTheme contextMenuTheme;
   final ShadCalendarTheme calendarTheme;
   final ShadDatePickerTheme datePickerTheme;
@@ -173,6 +176,7 @@ abstract class ShadThemeVariant {
   ShadResizableTheme resizableTheme();
   ShadHoverStrategies hoverStrategies();
   ShadTabsTheme tabsTheme();
+  ShadColorEditorTheme colorEditorTheme();
   ShadContextMenuTheme contextMenuTheme();
   ShadCalendarTheme calendarTheme();
   ShadDatePickerTheme datePickerTheme();

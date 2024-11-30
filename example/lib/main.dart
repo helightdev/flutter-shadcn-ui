@@ -8,6 +8,8 @@ import 'package:example/pages/calendar.dart';
 import 'package:example/pages/card.dart';
 import 'package:example/pages/checkbox.dart';
 import 'package:example/pages/checkbox_form_field.dart';
+import 'package:example/pages/color_editor.dart';
+import 'package:example/pages/color_picker.dart';
 import 'package:example/pages/context_menu.dart';
 import 'package:example/pages/date_picker.dart';
 import 'package:example/pages/date_picker_form_field.dart';
@@ -50,6 +52,8 @@ final routes = <String, WidgetBuilder>{
   '/avatar': (_) => const AvatarPage(),
   '/badge': (_) => const BadgePage(),
   '/button': (_) => const ButtonPage(),
+  '/color-editor': (_) => const ColorEditorPage(),
+  '/color-picker': (_) => const ColorPickerPage(),
   '/calendar': (_) => const CalendarPage(),
   '/card': (_) => const CardPage(),
   '/checkbox': (_) => const CheckboxPage(),
