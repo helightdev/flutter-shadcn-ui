@@ -19,7 +19,7 @@ void main() {
         constraints: const BoxConstraints(maxWidth: 600),
         child: ColorPickerTabView(
           tabs: const [
-            ColorPickerTab(
+            ShadColorPickerTab(
               title: 'HSL',
               features: {
                 ShadColorPickerFeature.colorPicker,
@@ -29,17 +29,17 @@ void main() {
                 ShadColorPickerFeature.hslRow,
               },
             ),
-            ColorPickerTab(
+            ShadColorPickerTab(
               title: 'RGB',
               features: {
                 ShadColorPickerFeature.colorPicker,
-                ShadColorPickerFeature.rgbSliders,
+                ShadColorPickerFeature.hueSlider,
                 ShadColorPickerFeature.alphaSlider,
                 ShadColorPickerFeature.hexField,
                 ShadColorPickerFeature.rgbRow,
               },
             ),
-            ColorPickerTab(
+            ShadColorPickerTab(
               title: 'VisHSL',
               features: {
                 ShadColorPickerFeature.colorPicker,
@@ -50,9 +50,9 @@ void main() {
                 ShadColorPickerFeature.hexField,
                 ShadColorPickerFeature.hslRow,
               },
-              sliderStyle: ComponentEditorStyle.sliderLabel,
+              showSliderLabels: true,
             ),
-            ColorPickerTab(
+            ShadColorPickerTab(
               title: 'VisRGB',
               features: {
                 ShadColorPickerFeature.colorPicker,
@@ -61,7 +61,7 @@ void main() {
                 ShadColorPickerFeature.hexField,
                 ShadColorPickerFeature.rgbRow,
               },
-              sliderStyle: ComponentEditorStyle.sliderLabel,
+              showSliderLabels: true,
             ),
           ],
           controller: controller,
@@ -105,6 +105,9 @@ void main() {
                             child: Text("Color"),
                           ));
                     },
+                  ),
+                  ShadColorPicker(
+                    controller: controller,
                   ),
                   Builder(
                     builder: (context) {
@@ -175,11 +178,147 @@ void main() {
   );
 }
 
+class ShadColorPicker extends StatefulWidget {
+  const ShadColorPicker({
+    super.key,
+    this.popoverController,
+    this.controller,
+  });
+
+  final ShadPopoverController? popoverController;
+  final ShadColorPickerController? controller;
+
+  @override
+  State<ShadColorPicker> createState() => _ShadColorPickerState();
+}
+
+class _ShadColorPickerState extends State<ShadColorPicker> {
+  ShadColorPickerController? _controller;
+
+  ShadColorPickerController get controller => widget.controller ?? _controller!;
+
+  ShadPopoverController? _popoverController;
+
+  ShadPopoverController get popoverController =>
+      widget.popoverController ?? _popoverController!;
+
+  @override
+  void initState() {
+    if (widget.controller == null) {
+      _controller =
+          ShadColorPickerController(const HSLColor.fromAHSL(1, 0, 1, 0.5));
+    }
+
+    if (widget.popoverController == null) {
+      _popoverController = ShadPopoverController();
+    }
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ShadPopover(
+      controller: popoverController,
+      popover: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.only(top: 8, bottom: 6),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 600,
+            ),
+            child: ColorPickerTabView(
+              tabs: const [
+                ShadColorPickerTab(
+                  title: 'HSL',
+                  features: {
+                    ShadColorPickerFeature.colorPicker,
+                    ShadColorPickerFeature.hueSlider,
+                    ShadColorPickerFeature.alphaSlider,
+                    ShadColorPickerFeature.hexField,
+                    ShadColorPickerFeature.hslRow,
+                  },
+                ),
+                ShadColorPickerTab(
+                  title: 'RGB',
+                  features: {
+                    ShadColorPickerFeature.colorPicker,
+                    ShadColorPickerFeature.hueSlider,
+                    ShadColorPickerFeature.alphaSlider,
+                    ShadColorPickerFeature.hexField,
+                    ShadColorPickerFeature.rgbRow,
+                  },
+                ),
+                ShadColorPickerTab(
+                  title: 'VisHSL',
+                  features: {
+                    ShadColorPickerFeature.colorPicker,
+                    ShadColorPickerFeature.hueSlider,
+                    ShadColorPickerFeature.saturationSlider,
+                    ShadColorPickerFeature.luminanceSlider,
+                    ShadColorPickerFeature.alphaSlider,
+                    ShadColorPickerFeature.hexField,
+                    ShadColorPickerFeature.hslRow,
+                  },
+                  showSliderLabels: true,
+                ),
+                ShadColorPickerTab(
+                    title: 'VisRGB',
+                    features: {
+                      ShadColorPickerFeature.colorPicker,
+                      ShadColorPickerFeature.rgbSliders,
+                      ShadColorPickerFeature.alphaSlider,
+                      ShadColorPickerFeature.hexField,
+                      ShadColorPickerFeature.rgbRow,
+                    },
+                    showSliderLabels: true),
+              ],
+              controller: controller,
+            ),
+          ),
+        );
+      },
+      child: ShadButton.outline(
+        padding: ShadTheme.of(context).datePickerTheme.buttonPadding,
+        height: ShadTheme.of(context).datePickerTheme.height,
+        size: ShadButtonSize.sm,
+        onPressed: () {
+          popoverController.toggle();
+        },
+        child: Row(
+          children: [
+            Text('#${controller.color.value.toRadixString(16)}'),
+            const SizedBox(width: 8),
+            ValueListenableBuilder(
+              valueListenable: controller,
+              builder: (context, value, _) {
+                return SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CustomPaint(
+                    painter: ColorPreviewPainter(
+                      color: value.toColor(),
+                      radius: BorderRadius.circular(4),
+                      checkerboard: true,
+                      showAlpha: true,
+                      shadows: ShadShadows.sm,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ColorPickerTabView extends StatefulWidget {
   const ColorPickerTabView(
       {super.key, required this.tabs, required this.controller});
 
-  final List<ColorPickerTab> tabs;
+  final List<ShadColorPickerTab> tabs;
   final ShadColorPickerController controller;
 
   @override
@@ -195,6 +334,7 @@ class _ColorPickerTabViewState extends State<ColorPickerTabView> {
     return Material(
       type: MaterialType.transparency,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           if (widget.tabs.length > 1)
             Padding(
@@ -234,16 +374,16 @@ enum ShadColorPickerFeature {
   hslRow;
 }
 
-class ColorPickerTab {
-  const ColorPickerTab({
+class ShadColorPickerTab {
+  const ShadColorPickerTab({
     required this.title,
     required this.features,
-    this.sliderStyle = ComponentEditorStyle.slider,
+    this.showSliderLabels = false,
   });
 
   final String title;
   final Set<ShadColorPickerFeature> features;
-  final ComponentEditorStyle sliderStyle;
+  final bool showSliderLabels;
 
   Widget build(ShadColorPickerController controller) {
     return IntrinsicHeight(
@@ -253,10 +393,10 @@ class ColorPickerTab {
               Expanded(
                 flex: 3,
                 child: Padding(
-                  padding: const EdgeInsets.all(4.0),
+                  padding: const EdgeInsets.all(4),
                   child: AspectRatio(
                     aspectRatio: 1,
-                    child: ShadColorPickerPalette(
+                    child: _ShadColorPickerPalette(
                       controller: controller,
                     ),
                   ),
@@ -272,6 +412,9 @@ class ColorPickerTab {
   }
 
   Widget buildSidebar(ShadColorPickerController controller) {
+    final sliderStyle = showSliderLabels
+        ? ComponentEditorStyle.sliderLabel
+        : ComponentEditorStyle.slider;
     return Column(
       children: [
         if (features.contains(ShadColorPickerFeature.hueSlider))
@@ -379,20 +522,6 @@ class ColorPickerTab {
   }
 }
 
-final LinearGradient _hlsHueGradient = _sampleGradient(
-  360,
-  (time) => HSLColor.fromAHSL(1, time * 360, 1, 0.5).toColor(),
-);
-
-LinearGradient _sampleGradient(
-  int sampleSize,
-  Color Function(double time) sampler,
-) {
-  return LinearGradient(
-    colors: List.generate(sampleSize, (i) => sampler(i / (sampleSize - 1))),
-  );
-}
-
 class ShadColorPickerController extends ValueNotifier<HSLColor> {
   ShadColorPickerController(super.value);
 
@@ -403,19 +532,28 @@ class ShadColorPickerController extends ValueNotifier<HSLColor> {
   set color(Color color) => value = HSLColor.fromColor(color);
 }
 
-class ShadColorPickerPalette extends StatefulWidget {
-  const ShadColorPickerPalette({super.key, required this.controller});
+class _ShadColorPickerPalette extends StatefulWidget {
+  const _ShadColorPickerPalette({
+    super.key,
+    required this.controller,
+    this.focusNode,
+  });
 
   final ShadColorPickerController controller;
+  final FocusNode? focusNode;
 
   @override
-  State<ShadColorPickerPalette> createState() => _ShadColorPickerPaletteState();
+  State<_ShadColorPickerPalette> createState() =>
+      _ShadColorPickerPaletteState();
 }
 
-class _ShadColorPickerPaletteState extends State<ShadColorPickerPalette> {
+class _ShadColorPickerPaletteState extends State<_ShadColorPickerPalette> {
   double x = 0;
   double y = 0;
   double hue = 0;
+  bool isFocused = false;
+
+  late final FocusNode focusNode = widget.focusNode ?? FocusNode();
 
   double get cHue => widget.controller.value.hue;
 
@@ -453,33 +591,71 @@ class _ShadColorPickerPaletteState extends State<ShadColorPickerPalette> {
     super.dispose();
   }
 
+  void moveCursor(double dx, double dy) {
+    setState(() {
+      x = (x + dx).clamp(0.0, 1.0);
+      y = (y + dy).clamp(0.0, 1.0);
+      widget.controller.value =
+          _transformXYH(hue, x, y).withAlpha(cColor.opacity);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (details) {
+    return Focus(
+      focusNode: focusNode,
+      onFocusChange: (focused) {
         setState(() {
-          final size = context.size!;
-          x = (details.localPosition.dx / size.width).clamp(0.0, 1.0);
-          y = (details.localPosition.dy / size.height).clamp(0.0, 1.0);
-          widget.controller.value =
-              _transformXYH(hue, x, y).withAlpha(cColor.opacity);
+          isFocused = focused;
         });
       },
-      onPanUpdate: (details) {
-        setState(() {
-          final size = context.size!;
-          x = (details.localPosition.dx / size.width).clamp(0.0, 1.0);
-          y = (details.localPosition.dy / size.height).clamp(0.0, 1.0);
-          widget.controller.value =
-              _transformXYH(hue, x, y).withAlpha(cColor.opacity);
-        });
+      onKeyEvent: (node, event) {
+        const sensitivity = 0.02;
+        final isEffective = event is KeyDownEvent || event is KeyRepeatEvent;
+        switch (event.logicalKey) {
+          case LogicalKeyboardKey.arrowLeft:
+            if (isEffective) moveCursor(-sensitivity, 0);
+            return KeyEventResult.handled;
+          case LogicalKeyboardKey.arrowRight:
+            if (isEffective) moveCursor(sensitivity, 0);
+            return KeyEventResult.handled;
+          case LogicalKeyboardKey.arrowUp:
+            if (isEffective) moveCursor(0, -sensitivity);
+            return KeyEventResult.handled;
+          case LogicalKeyboardKey.arrowDown:
+            if (isEffective) moveCursor(0, sensitivity);
+            return KeyEventResult.handled;
+          default:
+            return KeyEventResult.ignored;
+        }
       },
-      child: CustomPaint(
-        painter: _ShadColorPickerPalettePainter(
-          hue: hue,
-          x: x,
-          y: y,
-          theme: ShadTheme.of(context),
+      child: GestureDetector(
+        onTapDown: (details) {
+          setState(() {
+            final size = context.size!;
+            x = (details.localPosition.dx / size.width).clamp(0.0, 1.0);
+            y = (details.localPosition.dy / size.height).clamp(0.0, 1.0);
+            widget.controller.value =
+                _transformXYH(hue, x, y).withAlpha(cColor.opacity);
+          });
+        },
+        onPanUpdate: (details) {
+          setState(() {
+            final size = context.size!;
+            x = (details.localPosition.dx / size.width).clamp(0.0, 1.0);
+            y = (details.localPosition.dy / size.height).clamp(0.0, 1.0);
+            widget.controller.value =
+                _transformXYH(hue, x, y).withAlpha(cColor.opacity);
+          });
+        },
+        child: CustomPaint(
+          painter: _ShadColorPickerPalettePainter(
+            hue: hue,
+            x: x,
+            y: y,
+            theme: ShadTheme.of(context),
+            isFocused: isFocused,
+          ),
         ),
       ),
     );
@@ -492,6 +668,7 @@ class _ShadColorPickerPalettePainter extends CustomPainter {
     required this.x,
     required this.y,
     required this.theme,
+    this.isFocused = false,
   }) {
     xGradient = LinearGradient(
       colors: [
@@ -513,6 +690,7 @@ class _ShadColorPickerPalettePainter extends CustomPainter {
   final double x;
   final double y;
   final ShadThemeData theme;
+  final bool isFocused;
 
   late LinearGradient xGradient;
   late LinearGradient yGradient;
@@ -526,31 +704,37 @@ class _ShadColorPickerPalettePainter extends CustomPainter {
       ..drawRRect(
         rounded,
         Paint()
+          ..isAntiAlias = true
           ..style = PaintingStyle.fill
           ..shader = xGradient.createShader(rect),
       )
       ..drawRRect(
         rounded,
         Paint()
+          ..isAntiAlias = true
           ..style = PaintingStyle.fill
           ..shader = yGradient.createShader(rect)
           ..blendMode = BlendMode.multiply,
       );
 
     final cursorPos = Offset(x * size.width, y * size.height);
-
     final radius = theme.sliderTheme.thumbRadius!;
+    final actualRadius = switch (isFocused) {
+      true => radius + 4,
+      false => radius,
+    };
     final color = _colorFromXYH(hue, x, y);
     canvas
       ..drawShadow(
-        Path()..addOval(Rect.fromCircle(center: cursorPos, radius: radius)),
+        Path()
+          ..addOval(Rect.fromCircle(center: cursorPos, radius: actualRadius)),
         Colors.black,
         4,
         false,
       )
       ..drawCircle(
         cursorPos,
-        radius,
+        actualRadius,
         Paint()
           ..color = color
           ..style = PaintingStyle.fill,
@@ -563,11 +747,25 @@ class _ShadColorPickerPalettePainter extends CustomPainter {
           ..strokeWidth = 2
           ..style = PaintingStyle.stroke,
       );
+
+    if (isFocused) {
+      canvas.drawCircle(
+        cursorPos,
+        actualRadius,
+        Paint()
+          ..color = theme.sliderTheme.thumbBorderColor!
+          ..strokeWidth = 2
+          ..style = PaintingStyle.stroke,
+      );
+    }
   }
 
   @override
   bool shouldRepaint(_ShadColorPickerPalettePainter oldDelegate) {
-    return oldDelegate.hue != hue || oldDelegate.x != x || oldDelegate.y != y;
+    return oldDelegate.hue != hue ||
+        oldDelegate.x != x ||
+        oldDelegate.y != y ||
+        oldDelegate.isFocused != isFocused;
   }
 }
 
@@ -801,6 +999,7 @@ class HSLComponentSlider extends StatefulWidget {
 
 class _HSLComponentSliderState extends State<HSLComponentSlider> {
   double value = 0;
+  bool isFocused = false;
   TextEditingController textController = TextEditingController();
 
   @override
@@ -829,11 +1028,19 @@ class _HSLComponentSliderState extends State<HSLComponentSlider> {
 
   @override
   Widget build(BuildContext context) {
-    return switch (widget.style) {
-      ComponentEditorStyle.slider => _buildSlider(context, false),
-      ComponentEditorStyle.sliderLabel => _buildSlider(context, true),
-      ComponentEditorStyle.input => _buildInput(context),
-    };
+    return Focus(
+      skipTraversal: true,
+      onFocusChange: (focused) {
+        setState(() {
+          isFocused = focused;
+        });
+      },
+      child: switch (widget.style) {
+        ComponentEditorStyle.slider => _buildSlider(context, false),
+        ComponentEditorStyle.sliderLabel => _buildSlider(context, true),
+        ComponentEditorStyle.input => _buildInput(context),
+      },
+    );
   }
 
   Widget _buildInput(BuildContext context) {
@@ -913,6 +1120,7 @@ class _HSLComponentSliderState extends State<HSLComponentSlider> {
                         },
                         disabledBorderColor: Colors.white,
                         disabledThumbColor: Colors.white,
+                        focused: isFocused,
                       ),
                     ),
                 child: Slider(
@@ -1173,6 +1381,20 @@ class ColorPreviewPainter extends CustomPainter {
 }
 
 //<editor-fold desc="Utils">
+final LinearGradient _hlsHueGradient = _sampleGradient(
+  360,
+  (time) => HSLColor.fromAHSL(1, time * 360, 1, 0.5).toColor(),
+);
+
+LinearGradient _sampleGradient(
+  int sampleSize,
+  Color Function(double time) sampler,
+) {
+  return LinearGradient(
+    colors: List.generate(sampleSize, (i) => sampler(i / (sampleSize - 1))),
+  );
+}
+
 /// Computes the value of the gradient at the given time.
 Color _calcGradientColor(double t, LinearGradient gradient) {
   final colors = gradient.colors;
