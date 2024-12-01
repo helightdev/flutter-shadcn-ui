@@ -504,7 +504,7 @@ class _ShadColorPickerState extends State<ShadColorPicker> {
                     width: 16,
                     height: 16,
                     child: CustomPaint(
-                      painter: ColorPreviewPainter(
+                      painter: ShadColorEditorPreviewPainter(
                         color: value.toColor(),
                         radius: BorderRadius.circular(4),
                         checkerboard: true,

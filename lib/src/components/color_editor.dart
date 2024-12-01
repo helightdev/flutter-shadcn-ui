@@ -303,7 +303,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
       case ShadColorEditorFeature.colorArea:
         throw UnimplementedError();
       case ShadColorEditorFeature.hueSlider:
-        return ShadHSLComponentSlider(
+        return _HSLComponentSlider(
           component: HSLComponent.hue,
           controller: widget.controller,
           onChanged: widget.onChanged,
@@ -314,7 +314,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
           strings: effectiveStrings,
         );
       case ShadColorEditorFeature.saturationSlider:
-        return ShadHSLComponentSlider(
+        return _HSLComponentSlider(
           component: HSLComponent.saturation,
           controller: widget.controller,
           onChanged: widget.onChanged,
@@ -325,7 +325,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
           strings: effectiveStrings,
         );
       case ShadColorEditorFeature.luminanceSlider:
-        return ShadHSLComponentSlider(
+        return _HSLComponentSlider(
           component: HSLComponent.luminance,
           controller: widget.controller,
           onChanged: widget.onChanged,
@@ -336,7 +336,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
           strings: effectiveStrings,
         );
       case ShadColorEditorFeature.alphaSlider:
-        return ShadHSLComponentSlider(
+        return _HSLComponentSlider(
           component: HSLComponent.alpha,
           controller: widget.controller,
           onChanged: widget.onChanged,
@@ -349,7 +349,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
       case ShadColorEditorFeature.rgbSliders:
         return Column(
           children: [
-            RGBComponentSlider(
+            _RGBComponentSlider(
               component: RGBComponent.red,
               controller: widget.controller,
               onChanged: widget.onChanged,
@@ -359,7 +359,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
               strings: effectiveStrings,
             ),
             SizedBox(height: effectiveColumnSpacing),
-            RGBComponentSlider(
+            _RGBComponentSlider(
               component: RGBComponent.green,
               controller: widget.controller,
               onChanged: widget.onChanged,
@@ -369,7 +369,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
               strings: effectiveStrings,
             ),
             SizedBox(height: effectiveColumnSpacing),
-            RGBComponentSlider(
+            _RGBComponentSlider(
               component: RGBComponent.blue,
               controller: widget.controller,
               onChanged: widget.onChanged,
@@ -381,7 +381,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
           ],
         );
       case ShadColorEditorFeature.hexField:
-        return ShadHexComponentInput(
+        return _HexComponentInput(
           controller: widget.controller,
           onChanged: widget.onChanged,
           inputStyle: effectiveInputStyle,
@@ -390,7 +390,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
         return Row(
           children: [
             Flexible(
-              child: RGBComponentSlider(
+              child: _RGBComponentSlider(
                 component: RGBComponent.red,
                 controller: widget.controller,
                 onChanged: widget.onChanged,
@@ -403,7 +403,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
             ),
             SizedBox(width: effectiveRowSpacing),
             Flexible(
-              child: RGBComponentSlider(
+              child: _RGBComponentSlider(
                 component: RGBComponent.green,
                 controller: widget.controller,
                 onChanged: widget.onChanged,
@@ -416,7 +416,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
             ),
             SizedBox(width: effectiveRowSpacing),
             Flexible(
-              child: RGBComponentSlider(
+              child: _RGBComponentSlider(
                 component: RGBComponent.blue,
                 controller: widget.controller,
                 onChanged: widget.onChanged,
@@ -433,7 +433,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
         return Row(
           children: [
             Flexible(
-              child: ShadHSLComponentSlider(
+              child: _HSLComponentSlider(
                 component: HSLComponent.hue,
                 controller: widget.controller,
                 onChanged: widget.onChanged,
@@ -447,7 +447,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
             ),
             SizedBox(width: effectiveRowSpacing),
             Flexible(
-              child: ShadHSLComponentSlider(
+              child: _HSLComponentSlider(
                 component: HSLComponent.saturation,
                 controller: widget.controller,
                 onChanged: widget.onChanged,
@@ -461,7 +461,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
             ),
             SizedBox(width: effectiveRowSpacing),
             Flexible(
-              child: ShadHSLComponentSlider(
+              child: _HSLComponentSlider(
                 component: HSLComponent.luminance,
                 controller: widget.controller,
                 onChanged: widget.onChanged,
@@ -692,7 +692,7 @@ class _ShadColorEditorColorAreaState extends State<ShadColorEditorColorArea> {
           });
         },
         child: CustomPaint(
-          painter: ShadColorEditorColorFieldPainter(
+          painter: ShadColorEditorColorAreaPainter(
             hue: hue,
             x: x,
             y: y,
@@ -849,9 +849,8 @@ enum RGBComponent {
   }
 }
 
-class ShadHexComponentInput extends StatelessWidget {
-  const ShadHexComponentInput({
-    super.key,
+class _HexComponentInput extends StatelessWidget {
+  const _HexComponentInput({
     required this.controller,
     required this.inputStyle,
     this.onChanged,
@@ -892,9 +891,8 @@ class ShadHexComponentInput extends StatelessWidget {
   }
 }
 
-class ShadHSLComponentSlider extends StatefulWidget {
-  const ShadHSLComponentSlider({
-    super.key,
+class _HSLComponentSlider extends StatefulWidget {
+  const _HSLComponentSlider({
     required this.component,
     required this.controller,
     this.strings,
@@ -926,10 +924,10 @@ class ShadHSLComponentSlider extends StatefulWidget {
   final ShadColorEditorStringMap? strings;
 
   @override
-  State<ShadHSLComponentSlider> createState() => _ShadHSLComponentSliderState();
+  State<_HSLComponentSlider> createState() => _HSLComponentSliderState();
 }
 
-class _ShadHSLComponentSliderState extends State<ShadHSLComponentSlider> {
+class _HSLComponentSliderState extends State<_HSLComponentSlider> {
   double value = 0;
   bool isFocused = false;
   TextEditingController textController = TextEditingController();
@@ -1048,7 +1046,7 @@ class _ShadHSLComponentSliderState extends State<ShadHSLComponentSlider> {
           Flexible(
             flex: 3,
             child: CustomPaint(
-              painter: GradientTrackPainter(
+              painter: ShadSliderGradientTrackPainter(
                 gradient: gradient,
                 theme: theme,
                 checkerboard: widget.component == HSLComponent.alpha,
@@ -1092,9 +1090,8 @@ class _ShadHSLComponentSliderState extends State<ShadHSLComponentSlider> {
   }
 }
 
-class RGBComponentSlider extends StatefulWidget {
-  const RGBComponentSlider({
-    super.key,
+class _RGBComponentSlider extends StatefulWidget {
+  const _RGBComponentSlider({
     required this.component,
     required this.controller,
     this.onChanged,
@@ -1121,10 +1118,10 @@ class RGBComponentSlider extends StatefulWidget {
   final ShadColorEditorStringMap? strings;
 
   @override
-  State<RGBComponentSlider> createState() => _RGBComponentSliderState();
+  State<_RGBComponentSlider> createState() => _RGBComponentSliderState();
 }
 
-class _RGBComponentSliderState extends State<RGBComponentSlider> {
+class _RGBComponentSliderState extends State<_RGBComponentSlider> {
   final ShadSliderController sliderController =
       ShadSliderController(initialValue: 0);
   final TextEditingController textController = TextEditingController();
@@ -1236,8 +1233,8 @@ class _RGBComponentSliderState extends State<RGBComponentSlider> {
   }
 }
 
-class ShadColorEditorColorFieldPainter extends CustomPainter {
-  ShadColorEditorColorFieldPainter({
+class ShadColorEditorColorAreaPainter extends CustomPainter {
+  ShadColorEditorColorAreaPainter({
     required this.hue,
     required this.x,
     required this.y,
@@ -1335,7 +1332,7 @@ class ShadColorEditorColorFieldPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(ShadColorEditorColorFieldPainter oldDelegate) {
+  bool shouldRepaint(ShadColorEditorColorAreaPainter oldDelegate) {
     return oldDelegate.hue != hue ||
         oldDelegate.x != x ||
         oldDelegate.y != y ||
@@ -1343,8 +1340,8 @@ class ShadColorEditorColorFieldPainter extends CustomPainter {
   }
 }
 
-class GradientTrackPainter extends CustomPainter {
-  GradientTrackPainter({
+class ShadSliderGradientTrackPainter extends CustomPainter {
+  ShadSliderGradientTrackPainter({
     required this.gradient,
     required this.theme,
     this.checkerboard = false,
@@ -1432,14 +1429,14 @@ class GradientTrackPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant GradientTrackPainter oldDelegate) {
+  bool shouldRepaint(covariant ShadSliderGradientTrackPainter oldDelegate) {
     return oldDelegate.gradient != gradient ||
         oldDelegate.checkerboard != checkerboard;
   }
 }
 
-class ColorPreviewPainter extends CustomPainter {
-  const ColorPreviewPainter({
+class ShadColorEditorPreviewPainter extends CustomPainter {
+  const ShadColorEditorPreviewPainter({
     required this.color,
     required this.radius,
     required this.checkerboard,
@@ -1493,7 +1490,7 @@ class ColorPreviewPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant ColorPreviewPainter oldDelegate) {
+  bool shouldRepaint(covariant ShadColorEditorPreviewPainter oldDelegate) {
     return oldDelegate.color != color ||
         oldDelegate.checkerboard != checkerboard ||
         oldDelegate.showAlpha != showAlpha ||
