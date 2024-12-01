@@ -19,8 +19,9 @@ class ShadColorEditorTheme {
     this.inputStyle,
     this.inputSuffixStyle,
     this.inputDecoration,
-    this.tabsTheme,
-    this.sliderTheme,
+    this.tabsTheme = const ShadTabsTheme(),
+    this.sliderTheme = const ShadSliderTheme(),
+    this.strings,
   });
 
   final bool merge;
@@ -37,8 +38,9 @@ class ShadColorEditorTheme {
   final TextStyle? inputStyle;
   final TextStyle? inputSuffixStyle;
   final ShadDecoration? inputDecoration;
-  final ShadTabsTheme? tabsTheme;
-  final ShadSliderTheme? sliderTheme;
+  final ShadTabsTheme tabsTheme;
+  final ShadSliderTheme sliderTheme;
+  final ShadColorEditorStringMap? strings;
 
   static ShadColorEditorTheme lerp(
     ShadColorEditorTheme a,
@@ -64,18 +66,9 @@ class ShadColorEditorTheme {
           TextStyle.lerp(a.inputSuffixStyle, b.inputSuffixStyle, t),
       inputDecoration:
           ShadDecoration.lerp(a.inputDecoration, b.inputDecoration, t),
-      tabsTheme: switch ((a.tabsTheme, b.tabsTheme)) {
-        (null, null) => null,
-        (null, final value) => value,
-        (final value, null) => value,
-        (final from, final to) => ShadTabsTheme.lerp(from!, to!, t),
-      },
-      sliderTheme: switch ((a.sliderTheme, b.sliderTheme)) {
-        (null, null) => null,
-        (null, final value) => value,
-        (final value, null) => value,
-        (final from, final to) => ShadSliderTheme.lerp(from!, to!, t),
-      },
+      tabsTheme: ShadTabsTheme.lerp(a.tabsTheme, b.tabsTheme, t),
+      sliderTheme: ShadSliderTheme.lerp(a.sliderTheme, b.sliderTheme, t),
+      strings: t > 0.5 ? b.strings : a.strings,
     );
   }
 
@@ -95,13 +88,11 @@ class ShadColorEditorTheme {
       inputStyle: other.inputStyle,
       inputSuffixStyle: other.inputSuffixStyle,
       inputDecoration: other.inputDecoration,
-      tabsTheme: switch(other.tabsTheme) {
-        null => tabsTheme,
-        final value => tabsTheme?.mergeWith(value),
-      },
-      sliderTheme: switch(other.sliderTheme) {
-        null => sliderTheme,
-        final value => sliderTheme?.mergeWith(value),
+      tabsTheme: tabsTheme.mergeWith(other.tabsTheme),
+      sliderTheme: sliderTheme.mergeWith(other.sliderTheme),
+      strings: <ShadColorEditorStringKey, String>{
+        ...?strings,
+        ...?other.strings,
       },
     );
   }
@@ -122,6 +113,7 @@ class ShadColorEditorTheme {
     ShadDecoration? inputDecoration,
     ShadTabsTheme? tabsTheme,
     ShadSliderTheme? sliderTheme,
+    ShadColorEditorStringMap? strings,
   }) {
     return ShadColorEditorTheme(
       merge: merge ?? this.merge,
@@ -139,6 +131,48 @@ class ShadColorEditorTheme {
       inputDecoration: inputDecoration ?? this.inputDecoration,
       tabsTheme: tabsTheme ?? this.tabsTheme,
       sliderTheme: sliderTheme ?? this.sliderTheme,
+      strings: strings ?? this.strings,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShadColorEditorTheme &&
+          runtimeType == other.runtimeType &&
+          merge == other.merge &&
+          columnSpacing == other.columnSpacing &&
+          rowSpacing == other.rowSpacing &&
+          mainRowSpacing == other.mainRowSpacing &&
+          tabsPadding == other.tabsPadding &&
+          inputLabelPadding == other.inputLabelPadding &&
+          sliderLabelPadding == other.sliderLabelPadding &&
+          tabLabelStyle == other.tabLabelStyle &&
+          sliderLabelStyle == other.sliderLabelStyle &&
+          inputLabelStyle == other.inputLabelStyle &&
+          inputStyle == other.inputStyle &&
+          inputSuffixStyle == other.inputSuffixStyle &&
+          inputDecoration == other.inputDecoration &&
+          tabsTheme == other.tabsTheme &&
+          sliderTheme == other.sliderTheme &&
+          strings == other.strings;
+
+  @override
+  int get hashCode =>
+      merge.hashCode ^
+      columnSpacing.hashCode ^
+      rowSpacing.hashCode ^
+      mainRowSpacing.hashCode ^
+      tabsPadding.hashCode ^
+      inputLabelPadding.hashCode ^
+      sliderLabelPadding.hashCode ^
+      tabLabelStyle.hashCode ^
+      sliderLabelStyle.hashCode ^
+      inputLabelStyle.hashCode ^
+      inputStyle.hashCode ^
+      inputSuffixStyle.hashCode ^
+      inputDecoration.hashCode ^
+      tabsTheme.hashCode ^
+      sliderTheme.hashCode ^
+      strings.hashCode;
 }

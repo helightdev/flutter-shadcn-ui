@@ -17,6 +17,7 @@ import 'package:shadcn_ui/src/theme/components/calendar.dart';
 import 'package:shadcn_ui/src/theme/components/card.dart';
 import 'package:shadcn_ui/src/theme/components/checkbox.dart';
 import 'package:shadcn_ui/src/theme/components/color_editor.dart';
+import 'package:shadcn_ui/src/theme/components/color_picker.dart';
 import 'package:shadcn_ui/src/theme/components/context_menu.dart';
 import 'package:shadcn_ui/src/theme/components/date_picker.dart';
 import 'package:shadcn_ui/src/theme/components/decorator.dart';
@@ -943,6 +944,18 @@ class ShadDefaultThemeNoSecondaryBorderVariant extends ShadThemeVariant {
       sliderLabelStyle: effectiveTextTheme.small,
       inputLabelPadding: const EdgeInsets.only(left: 4),
       sliderLabelPadding: const EdgeInsets.only(left: 4),
+    );
+  }
+
+  @override
+  ShadColorPickerTheme colorPickerTheme() {
+    return const ShadColorPickerTheme(
+      buttonVariant: ShadButtonVariant.outline,
+      popoverConstraints: BoxConstraints(maxWidth: 600),
+      buttonTheme: ShadButtonTheme(
+        size: ShadButtonSize.sm,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      ),
     );
   }
 }

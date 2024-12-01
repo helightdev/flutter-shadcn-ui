@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
+typedef ShadColorEditorStringMap = Map<ShadColorEditorStringKey, String>;
+
 class ShadColorEditor extends StatefulWidget {
   const ShadColorEditor({
     super.key,
@@ -27,6 +29,7 @@ class ShadColorEditor extends StatefulWidget {
     this.sliderLabelPadding,
     this.tabsTheme,
     this.sliderTheme,
+    this.strings,
   });
 
   final List<ShadColorEditorTab> tabs;
@@ -46,6 +49,7 @@ class ShadColorEditor extends StatefulWidget {
   final EdgeInsets? sliderLabelPadding;
   final ShadTabsTheme? tabsTheme;
   final ShadSliderTheme? sliderTheme;
+  final ShadColorEditorStringMap? strings;
 
   final ValueChanged<Color>? onChanged;
 
@@ -55,7 +59,6 @@ class ShadColorEditor extends StatefulWidget {
 
 class _ShadColorEditorState extends State<ShadColorEditor> {
   final ShadTabsController<int> controller = ShadTabsController(value: 0);
-  int currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -80,35 +83,33 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
             widget.sliderTheme ?? theme.colorEditorTheme.sliderTheme,
           ),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (widget.tabs.length > 1)
-              Padding(
-                padding: effectiveTabsPadding,
-                child: ShadTabs<int>(
-                  tabs: widget.tabs
-                      .mapIndexed(
-                        (i, e) => ShadTab(
-                          value: i,
-                          child: Text(
-                            e.title,
-                            style: widget.tabLabelStyle,
-                          ),
+        child: ListenableBuilder(
+          listenable: controller,
+          builder: (context, _) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.tabs.length > 1)
+                Padding(
+                  padding: effectiveTabsPadding,
+                  child: ShadTabs<int>(
+                    tabs: widget.tabs
+                        .mapIndexed(
+                          (i, e) => ShadTab(
+                        value: i,
+                        child: Text(
+                          e.title,
+                          style: widget.tabLabelStyle,
                         ),
-                      )
-                      .toList(),
-                  expandContent: false,
-                  controller: controller,
-                  onChanged: (index) {
-                    setState(() {
-                      currentIndex = index;
-                    });
-                  },
+                      ),
+                    )
+                        .toList(),
+                    expandContent: false,
+                    controller: controller,
+                  ),
                 ),
-              ),
-            buildTab(widget.tabs[currentIndex]),
-          ],
+              buildTab(widget.tabs[controller.selected]),
+            ],
+          ),
         ),
       ),
     );
@@ -118,7 +119,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
     final centerGap = widget.mainRowSpacing ?? 16;
     return IntrinsicHeight(
       child: switch (
-          tab.features.contains(ShadColorPickerFeature.colorPicker)) {
+          tab.features.contains(ShadColorEditorFeature.colorPicker)) {
         true => Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -154,9 +155,10 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
       );
 
     if (!widget.controller.transparency) {
-      sortedFeatures.remove(ShadColorPickerFeature.alphaSlider);
+      sortedFeatures.remove(ShadColorEditorFeature.alphaSlider);
     }
 
+    final theme = ShadTheme.of(context);
     final effectiveGap = widget.columnSpacing ?? 8;
 
     final children = <Widget>[];
@@ -178,7 +180,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
       } else {
         children.add(SizedBox(height: effectiveGap));
       }
-      children.add(buildFeature(tab, feature));
+      children.add(buildFeature(tab, feature, theme));
     }
 
     return Column(
@@ -186,12 +188,14 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
     );
   }
 
-  Widget buildFeature(ShadColorEditorTab tab, ShadColorPickerFeature feat) {
+  Widget buildFeature(
+    ShadColorEditorTab tab,
+    ShadColorEditorFeature feat,
+    ShadThemeData theme,
+  ) {
     final sliderStyle = tab.showSliderLabels
         ? ComponentEditorStyle.sliderLabel
         : ComponentEditorStyle.slider;
-
-    final theme = ShadTheme.of(context);
 
     final editorTheme = theme.colorEditorTheme;
 
@@ -212,11 +216,17 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
         widget.inputLabelPadding ?? editorTheme.inputLabelPadding;
     final effectiveSliderLabelPadding =
         widget.sliderLabelPadding ?? editorTheme.sliderLabelPadding;
+    final effectiveStrings = ShadColorEditorStringKey.filled(
+      <ShadColorEditorStringKey, String>{
+        ...?widget.strings,
+        ...?editorTheme.strings,
+      },
+    );
 
     switch (feat) {
-      case ShadColorPickerFeature.colorPicker:
+      case ShadColorEditorFeature.colorPicker:
         throw UnimplementedError();
-      case ShadColorPickerFeature.hueSlider:
+      case ShadColorEditorFeature.hueSlider:
         return ShadHSLComponentSlider(
           component: HSLComponent.hue,
           controller: widget.controller,
@@ -225,8 +235,9 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
           style: sliderStyle,
           sliderLabelStyle: effectiveSliderLabelStyle,
           sliderLabelPadding: effectiveSliderLabelPadding,
+          strings: effectiveStrings,
         );
-      case ShadColorPickerFeature.saturationSlider:
+      case ShadColorEditorFeature.saturationSlider:
         return ShadHSLComponentSlider(
           component: HSLComponent.saturation,
           controller: widget.controller,
@@ -235,18 +246,20 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
           style: sliderStyle,
           sliderLabelStyle: effectiveSliderLabelStyle,
           sliderLabelPadding: effectiveSliderLabelPadding,
+          strings: effectiveStrings,
         );
-      case ShadColorPickerFeature.luminanceSlider:
+      case ShadColorEditorFeature.luminanceSlider:
         return ShadHSLComponentSlider(
-          component: HSLComponent.lightness,
+          component: HSLComponent.luminance,
           controller: widget.controller,
           onChanged: widget.onChanged,
           fixedGradient: tab.fixedGradient,
           style: sliderStyle,
           sliderLabelStyle: effectiveSliderLabelStyle,
           sliderLabelPadding: effectiveSliderLabelPadding,
+          strings: effectiveStrings,
         );
-      case ShadColorPickerFeature.alphaSlider:
+      case ShadColorEditorFeature.alphaSlider:
         return ShadHSLComponentSlider(
           component: HSLComponent.alpha,
           controller: widget.controller,
@@ -255,8 +268,9 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
           style: sliderStyle,
           sliderLabelStyle: effectiveSliderLabelStyle,
           sliderLabelPadding: effectiveSliderLabelPadding,
+          strings: effectiveStrings,
         );
-      case ShadColorPickerFeature.rgbSliders:
+      case ShadColorEditorFeature.rgbSliders:
         return Column(
           children: [
             RGBComponentSlider(
@@ -266,6 +280,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
               style: sliderStyle,
               sliderLabelStyle: effectiveSliderLabelStyle,
               sliderLabelPadding: effectiveSliderLabelPadding,
+              strings: effectiveStrings,
             ),
             SizedBox(height: effectiveColumnSpacing),
             RGBComponentSlider(
@@ -275,6 +290,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
               style: sliderStyle,
               sliderLabelStyle: effectiveSliderLabelStyle,
               sliderLabelPadding: effectiveSliderLabelPadding,
+              strings: effectiveStrings,
             ),
             SizedBox(height: effectiveColumnSpacing),
             RGBComponentSlider(
@@ -284,16 +300,17 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
               style: sliderStyle,
               sliderLabelStyle: effectiveSliderLabelStyle,
               sliderLabelPadding: effectiveSliderLabelPadding,
+              strings: effectiveStrings,
             ),
           ],
         );
-      case ShadColorPickerFeature.hexField:
+      case ShadColorEditorFeature.hexField:
         return ShadHexComponentInput(
           controller: widget.controller,
           onChanged: widget.onChanged,
           inputStyle: effectiveInputStyle,
         );
-      case ShadColorPickerFeature.rgbRow:
+      case ShadColorEditorFeature.rgbRow:
         return Row(
           children: [
             Flexible(
@@ -305,6 +322,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
                 inputStyle: effectiveInputStyle,
                 inputDecoration: effectiveInputDecoration,
                 inputLabelPadding: effectiveInputLabelPadding,
+                strings: effectiveStrings,
               ),
             ),
             SizedBox(width: effectiveRowSpacing),
@@ -317,6 +335,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
                 inputStyle: effectiveInputStyle,
                 inputDecoration: effectiveInputDecoration,
                 inputLabelPadding: effectiveInputLabelPadding,
+                strings: effectiveStrings,
               ),
             ),
             SizedBox(width: effectiveRowSpacing),
@@ -329,11 +348,12 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
                 inputStyle: effectiveInputStyle,
                 inputDecoration: effectiveInputDecoration,
                 inputLabelPadding: effectiveInputLabelPadding,
+                strings: effectiveStrings,
               ),
             ),
           ],
         );
-      case ShadColorPickerFeature.hslRow:
+      case ShadColorEditorFeature.hslRow:
         return Row(
           children: [
             Flexible(
@@ -346,6 +366,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
                 inputSuffixStyle: effectiveInputSuffixStyle,
                 inputDecoration: effectiveInputDecoration,
                 inputLabelPadding: effectiveInputLabelPadding,
+                strings: effectiveStrings,
               ),
             ),
             SizedBox(width: effectiveRowSpacing),
@@ -359,12 +380,13 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
                 inputSuffixStyle: effectiveInputSuffixStyle,
                 inputDecoration: effectiveInputDecoration,
                 inputLabelPadding: effectiveInputLabelPadding,
+                strings: effectiveStrings,
               ),
             ),
             SizedBox(width: effectiveRowSpacing),
             Flexible(
               child: ShadHSLComponentSlider(
-                component: HSLComponent.lightness,
+                component: HSLComponent.luminance,
                 controller: widget.controller,
                 onChanged: widget.onChanged,
                 inputLabelStyle: effectiveInputLabelStyle,
@@ -372,45 +394,13 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
                 inputSuffixStyle: effectiveInputSuffixStyle,
                 inputDecoration: effectiveInputDecoration,
                 inputLabelPadding: effectiveInputLabelPadding,
+                strings: effectiveStrings,
               ),
             ),
           ],
         );
     }
   }
-}
-
-enum ShadColorPickerFeature {
-  colorPicker(false, -1),
-  hueSlider(true, 1),
-  saturationSlider(true, 2),
-  luminanceSlider(true, 3),
-  alphaSlider(true, 4),
-  rgbSliders(true, 5),
-  hexField(true, 10),
-  rgbRow(true, 11),
-  hslRow(true, 12);
-
-  const ShadColorPickerFeature(this.sidebar, this.precedence);
-
-  final int precedence;
-  final bool sidebar;
-}
-
-class ShadColorEditorTab {
-  const ShadColorEditorTab({
-    required this.title,
-    required this.features,
-    this.showSliderLabels = false,
-    this.expandSpacer = true,
-    this.fixedGradient = false,
-  });
-
-  final String title;
-  final Set<ShadColorPickerFeature> features;
-  final bool showSliderLabels;
-  final bool expandSpacer;
-  final bool fixedGradient;
 }
 
 class ShadColorEditorController extends ValueNotifier<HSLColor> {
@@ -445,6 +435,66 @@ class ShadColorEditorController extends ValueNotifier<HSLColor> {
   Color get hueColor => HSLColor.fromAHSL(1, value.hue, 1, 0.5).toColor();
 
   set color(Color color) => value = HSLColor.fromColor(color);
+}
+
+enum ShadColorEditorFeature {
+  colorPicker(false, -1),
+  hueSlider(true, 1),
+  saturationSlider(true, 2),
+  luminanceSlider(true, 3),
+  alphaSlider(true, 4),
+  rgbSliders(true, 5),
+  hexField(true, 10),
+  rgbRow(true, 11),
+  hslRow(true, 12);
+
+  const ShadColorEditorFeature(this.sidebar, this.precedence);
+
+  final int precedence;
+  final bool sidebar;
+}
+
+enum ShadColorEditorStringKey {
+  hue('Hue'),
+  saturation('Sat'),
+  luminance('Lum'),
+  alpha('Alpha'),
+  red('Red'),
+  green('Green'),
+  blue('Blue');
+
+  const ShadColorEditorStringKey(this.defaultValue);
+
+  final String defaultValue;
+
+  String resolve(ShadColorEditorStringMap? map) {
+    return map?[this] ?? defaultValue;
+  }
+
+  static Map<ShadColorEditorStringKey, String> filled(
+    Map<ShadColorEditorStringKey, String>? map,
+  ) {
+    return {
+      for (final key in ShadColorEditorStringKey.values)
+        key: map?[key] ?? key.defaultValue,
+    };
+  }
+}
+
+class ShadColorEditorTab {
+  const ShadColorEditorTab({
+    required this.title,
+    required this.features,
+    this.showSliderLabels = false,
+    this.expandSpacer = true,
+    this.fixedGradient = false,
+  });
+
+  final String title;
+  final Set<ShadColorEditorFeature> features;
+  final bool showSliderLabels;
+  final bool expandSpacer;
+  final bool fixedGradient;
 }
 
 class ShadColorEditorColorField extends StatefulWidget {
@@ -582,20 +632,13 @@ class _ShadColorEditorColorFieldState extends State<ShadColorEditorColorField> {
 enum HSLComponent {
   hue,
   saturation,
-  lightness,
+  luminance,
   alpha;
-
-  String get label => switch (this) {
-        HSLComponent.hue => 'Hue',
-        HSLComponent.saturation => 'Sat',
-        HSLComponent.lightness => 'Lum',
-        HSLComponent.alpha => 'Alpha',
-      };
 
   double get maxEditorValue => switch (this) {
         HSLComponent.hue => 360,
         HSLComponent.saturation => 100,
-        HSLComponent.lightness => 100,
+        HSLComponent.luminance => 100,
         HSLComponent.alpha => 100,
       };
 
@@ -603,7 +646,7 @@ enum HSLComponent {
     return switch (this) {
       HSLComponent.hue => color.hue / 360,
       HSLComponent.saturation => color.saturation,
-      HSLComponent.lightness => color.lightness,
+      HSLComponent.luminance => color.lightness,
       HSLComponent.alpha => color.alpha,
     };
   }
@@ -622,7 +665,7 @@ enum HSLComponent {
           clampDouble(value, 0, 1),
           color.lightness,
         ),
-      HSLComponent.lightness => HSLColor.fromAHSL(
+      HSLComponent.luminance => HSLColor.fromAHSL(
           color.alpha,
           color.hue,
           color.saturation,
@@ -643,7 +686,7 @@ enum HSLComponent {
         HSLComponent.hue => _hlsHueGradient,
         HSLComponent.saturation =>
           const LinearGradient(colors: [Colors.grey, Colors.red]),
-        HSLComponent.lightness =>
+        HSLComponent.luminance =>
           const LinearGradient(colors: [Colors.black, Colors.white]),
         HSLComponent.alpha => const LinearGradient(
             colors: [Colors.transparent, Colors.black],
@@ -665,7 +708,7 @@ enum HSLComponent {
             (time) => HSLColor.fromAHSL(1, color.hue, time, color.lightness)
                 .toColor(),
           ),
-        HSLComponent.lightness => _sampleGradient(
+        HSLComponent.luminance => _sampleGradient(
             16,
             (time) => HSLColor.fromAHSL(1, color.hue, color.saturation, time)
                 .toColor(),
@@ -690,13 +733,6 @@ enum RGBComponent {
   green,
   blue,
   alpha;
-
-  String get label => switch (this) {
-        RGBComponent.red => 'Red',
-        RGBComponent.green => 'Green',
-        RGBComponent.blue => 'Blue',
-        RGBComponent.alpha => 'Alpha',
-      };
 
   double getValue(Color color) {
     return switch (this) {
@@ -785,6 +821,7 @@ class ShadHSLComponentSlider extends StatefulWidget {
     super.key,
     required this.component,
     required this.controller,
+    this.strings,
     this.onChanged,
     this.fixedGradient = false,
     this.style = ComponentEditorStyle.input,
@@ -810,6 +847,7 @@ class ShadHSLComponentSlider extends StatefulWidget {
   final EdgeInsets? sliderLabelPadding;
 
   final ValueChanged<Color>? onChanged;
+  final ShadColorEditorStringMap? strings;
 
   @override
   State<ShadHSLComponentSlider> createState() => _ShadHSLComponentSliderState();
@@ -861,6 +899,17 @@ class _ShadHSLComponentSliderState extends State<ShadHSLComponentSlider> {
     );
   }
 
+  String get labelContent => switch (widget.component) {
+        HSLComponent.hue =>
+          ShadColorEditorStringKey.hue.resolve(widget.strings),
+        HSLComponent.saturation =>
+          ShadColorEditorStringKey.saturation.resolve(widget.strings),
+        HSLComponent.luminance =>
+          ShadColorEditorStringKey.luminance.resolve(widget.strings),
+        HSLComponent.alpha =>
+          ShadColorEditorStringKey.alpha.resolve(widget.strings),
+      };
+
   Widget _buildInput(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -868,7 +917,7 @@ class _ShadHSLComponentSliderState extends State<ShadHSLComponentSlider> {
         Padding(
           padding: widget.inputLabelPadding ?? const EdgeInsets.only(left: 4),
           child: Text(
-            widget.component.label,
+            labelContent,
             style: widget.inputLabelStyle,
           ),
         ),
@@ -916,7 +965,7 @@ class _ShadHSLComponentSliderState extends State<ShadHSLComponentSlider> {
           if (useLabel)
             Expanded(
               child: Text(
-                widget.component.label,
+                labelContent,
                 style: widget.sliderLabelStyle,
               ),
             ),
@@ -980,6 +1029,7 @@ class RGBComponentSlider extends StatefulWidget {
     this.inputDecoration,
     this.inputLabelPadding,
     this.sliderLabelPadding,
+    this.strings,
   });
 
   final RGBComponent component;
@@ -992,6 +1042,7 @@ class RGBComponentSlider extends StatefulWidget {
   final ValueChanged<Color>? onChanged;
   final EdgeInsets? inputLabelPadding;
   final EdgeInsets? sliderLabelPadding;
+  final ShadColorEditorStringMap? strings;
 
   @override
   State<RGBComponentSlider> createState() => _RGBComponentSliderState();
@@ -1023,6 +1074,17 @@ class _RGBComponentSliderState extends State<RGBComponentSlider> {
     }
   }
 
+  String get labelContent => switch (widget.component) {
+        RGBComponent.red =>
+          ShadColorEditorStringKey.red.resolve(widget.strings),
+        RGBComponent.green =>
+          ShadColorEditorStringKey.green.resolve(widget.strings),
+        RGBComponent.blue =>
+          ShadColorEditorStringKey.blue.resolve(widget.strings),
+        RGBComponent.alpha =>
+          ShadColorEditorStringKey.alpha.resolve(widget.strings),
+      };
+
   @override
   Widget build(BuildContext context) {
     return switch (widget.style) {
@@ -1039,7 +1101,7 @@ class _RGBComponentSliderState extends State<RGBComponentSlider> {
         Padding(
           padding: widget.inputLabelPadding ?? const EdgeInsets.only(left: 4),
           child: Text(
-            widget.component.label,
+            labelContent,
             style: widget.inputLabelStyle,
           ),
         ),
@@ -1077,7 +1139,7 @@ class _RGBComponentSliderState extends State<RGBComponentSlider> {
           if (useLabel)
             Expanded(
               child: Text(
-                widget.component.label,
+                labelContent,
                 style: widget.sliderLabelStyle,
               ),
             ),

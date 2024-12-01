@@ -61,13 +61,13 @@ class _ColorPickerPageState extends State<ColorPickerPage> {
             ShadColorEditorTab(
                 title: "HSL",
                 features: {
-                  ShadColorPickerFeature.colorPicker,
-                  ShadColorPickerFeature.hueSlider,
-                  ShadColorPickerFeature.saturationSlider,
-                  ShadColorPickerFeature.luminanceSlider,
-                  ShadColorPickerFeature.alphaSlider,
-                  ShadColorPickerFeature.hexField,
-                  ShadColorPickerFeature.hslRow,
+                  ShadColorEditorFeature.colorPicker,
+                  ShadColorEditorFeature.hueSlider,
+                  ShadColorEditorFeature.saturationSlider,
+                  ShadColorEditorFeature.luminanceSlider,
+                  ShadColorEditorFeature.alphaSlider,
+                  ShadColorEditorFeature.hexField,
+                  ShadColorEditorFeature.hslRow,
                 },
                 expandSpacer: true)
           ],
@@ -81,11 +81,11 @@ class _ColorPickerPageState extends State<ColorPickerPage> {
             ShadColorEditorTab(
                 title: "HSL",
                 features: {
-                  ShadColorPickerFeature.colorPicker,
-                  ShadColorPickerFeature.hueSlider,
-                  ShadColorPickerFeature.hexField,
-                  ShadColorPickerFeature.hslRow,
-                  ShadColorPickerFeature.rgbRow,
+                  ShadColorEditorFeature.colorPicker,
+                  ShadColorEditorFeature.hueSlider,
+                  ShadColorEditorFeature.hexField,
+                  ShadColorEditorFeature.hslRow,
+                  ShadColorEditorFeature.rgbRow,
                 },
                 expandSpacer: true)
           ],
@@ -97,21 +97,21 @@ class _ColorPickerPageState extends State<ColorPickerPage> {
           popoverController: popover3,
           tabs: [
             ShadColorEditorTab(title: "HSL", features: {
-              ShadColorPickerFeature.colorPicker,
-              ShadColorPickerFeature.hueSlider,
-              ShadColorPickerFeature.saturationSlider,
-              ShadColorPickerFeature.luminanceSlider,
-              ShadColorPickerFeature.alphaSlider,
-              ShadColorPickerFeature.hexField,
-              ShadColorPickerFeature.hslRow,
+              ShadColorEditorFeature.colorPicker,
+              ShadColorEditorFeature.hueSlider,
+              ShadColorEditorFeature.saturationSlider,
+              ShadColorEditorFeature.luminanceSlider,
+              ShadColorEditorFeature.alphaSlider,
+              ShadColorEditorFeature.hexField,
+              ShadColorEditorFeature.hslRow,
             },),
             ShadColorEditorTab(
               title: "RGB",
               features: {
-                ShadColorPickerFeature.colorPicker,
-                ShadColorPickerFeature.rgbSliders,
-                ShadColorPickerFeature.alphaSlider,
-                ShadColorPickerFeature.rgbRow,
+                ShadColorEditorFeature.colorPicker,
+                ShadColorEditorFeature.rgbSliders,
+                ShadColorEditorFeature.alphaSlider,
+                ShadColorEditorFeature.rgbRow,
               },
               fixedGradient: true,
             )

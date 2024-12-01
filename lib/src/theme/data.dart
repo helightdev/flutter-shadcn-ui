@@ -11,6 +11,7 @@ import 'package:shadcn_ui/src/theme/components/calendar.dart';
 import 'package:shadcn_ui/src/theme/components/card.dart';
 import 'package:shadcn_ui/src/theme/components/checkbox.dart';
 import 'package:shadcn_ui/src/theme/components/color_editor.dart';
+import 'package:shadcn_ui/src/theme/components/color_picker.dart';
 import 'package:shadcn_ui/src/theme/components/context_menu.dart';
 import 'package:shadcn_ui/src/theme/components/date_picker.dart';
 import 'package:shadcn_ui/src/theme/components/decorator.dart';
@@ -85,11 +86,12 @@ class ShadThemeData extends ShadBaseTheme {
     bool? disableSecondaryBorder,
     ShadTabsTheme? tabsTheme,
     ShadThemeVariant? variant,
-    ShadColorEditorTheme? colorEditorTheme,
     ShadContextMenuTheme? contextMenuTheme,
     ShadCalendarTheme? calendarTheme,
     ShadDatePickerTheme? datePickerTheme,
     ShadTimePickerTheme? timePickerTheme,
+    ShadColorEditorTheme? colorEditorTheme,
+    ShadColorPickerTheme? colorPickerTheme,
   }) {
     final effectiveRadius =
         radius ?? const BorderRadius.all(Radius.circular(6));
@@ -233,6 +235,8 @@ class ShadThemeData extends ShadBaseTheme {
           effectiveVariant.timePickerTheme().mergeWith(timePickerTheme),
       colorEditorTheme:
           effectiveVariant.colorEditorTheme().mergeWith(colorEditorTheme),
+      colorPickerTheme:
+          effectiveVariant.colorPickerTheme().mergeWith(colorPickerTheme),
     );
   }
 
@@ -281,11 +285,12 @@ class ShadThemeData extends ShadBaseTheme {
     required super.hoverStrategies,
     required super.disableSecondaryBorder,
     required super.tabsTheme,
-    required super.colorEditorTheme,
     required super.contextMenuTheme,
     required super.calendarTheme,
     required super.datePickerTheme,
     required super.timePickerTheme,
+    required super.colorEditorTheme,
+    required super.colorPickerTheme,
   });
 
   static ShadThemeData lerp(ShadThemeData a, ShadThemeData b, double t) {
@@ -386,6 +391,13 @@ class ShadThemeData extends ShadBaseTheme {
           ShadDatePickerTheme.lerp(a.datePickerTheme, b.datePickerTheme, t),
       timePickerTheme:
           ShadTimePickerTheme.lerp(a.timePickerTheme, b.timePickerTheme, t),
+      colorEditorTheme:
+          ShadColorEditorTheme.lerp(a.colorEditorTheme, b.colorEditorTheme, t),
+      colorPickerTheme: ShadColorPickerTheme.lerp(
+        a.colorPickerTheme,
+        b.colorPickerTheme,
+        t,
+      ),
     );
   }
 
@@ -441,7 +453,9 @@ class ShadThemeData extends ShadBaseTheme {
         other.contextMenuTheme == contextMenuTheme &&
         other.calendarTheme == calendarTheme &&
         other.datePickerTheme == datePickerTheme &&
-        other.timePickerTheme == timePickerTheme;
+        other.timePickerTheme == timePickerTheme &&
+        other.colorEditorTheme == colorEditorTheme &&
+        other.colorPickerTheme == colorPickerTheme;
   }
 
   @override
@@ -493,7 +507,9 @@ class ShadThemeData extends ShadBaseTheme {
         contextMenuTheme.hashCode ^
         calendarTheme.hashCode ^
         datePickerTheme.hashCode ^
-        timePickerTheme.hashCode;
+        timePickerTheme.hashCode ^
+        colorEditorTheme.hashCode ^
+        colorPickerTheme.hashCode;
   }
 
   ShadThemeData copyWith({
@@ -545,6 +561,8 @@ class ShadThemeData extends ShadBaseTheme {
     ShadCalendarTheme? calendarTheme,
     ShadDatePickerTheme? datePickerTheme,
     ShadTimePickerTheme? timePickerTheme,
+    ShadColorEditorTheme? colorEditorTheme,
+    ShadColorPickerTheme? colorPickerTheme,
   }) {
     return ShadThemeData(
       colorScheme: colorScheme ?? this.colorScheme,
@@ -600,6 +618,8 @@ class ShadThemeData extends ShadBaseTheme {
       calendarTheme: calendarTheme ?? this.calendarTheme,
       datePickerTheme: datePickerTheme ?? this.datePickerTheme,
       timePickerTheme: timePickerTheme ?? this.timePickerTheme,
+      colorEditorTheme: colorEditorTheme ?? this.colorEditorTheme,
+      colorPickerTheme: colorPickerTheme ?? this.colorPickerTheme,
     );
   }
 }
