@@ -11,7 +11,7 @@ class ShadColorPicker extends StatefulWidget {
     this.popoverController,
     this.controller,
     this.initialValue,
-    this.tabs = const [],
+    this.tabs,
     this.popoverConstraints,
 
     // Editor
@@ -48,7 +48,6 @@ class ShadColorPicker extends StatefulWidget {
     this.onPressed,
     this.onLongPress,
     this.icon,
-    this.iconSrc,
     this.buttonChild,
     this.buttonVariant,
     this.size,
@@ -96,28 +95,54 @@ class ShadColorPicker extends StatefulWidget {
     this.onFocusChange,
   });
 
+  /// The controller that will be used to control the popover.
   final ShadPopoverController? popoverController;
+
+  /// The controller that will be used to control the color picker.
   final ShadColorEditorController? controller;
+
+  /// The initial value of the color picker.
   final Color? initialValue;
-  final List<ShadColorEditorTab> tabs;
+
+  /// {@template ShadColorPicker.popoverConstraints}
+  /// The constraints that will be applied to the popover.
+  /// {@endtemplate}
+  ///
   final BoxConstraints? popoverConstraints;
 
   // Editor
+  /// {@macro ShadColorEditor.tabs}
+  final List<ShadColorEditorTab>? tabs;
+  /// {@macro ShadColorEditor.columnSpacing}
   final double? columnSpacing;
+  /// {@macro ShadColorEditor.rowSpacing}
   final double? rowSpacing;
+  /// {@macro ShadColorEditor.mainRowSpacing}
   final double? mainRowSpacing;
+  /// {@macro ShadColorEditor.tabsPadding}
   final EdgeInsets? tabsPadding;
-
+  /// {@macro ShadColorEditor.tabLabelStyle}
   final TextStyle? tabLabelStyle;
+  /// {@macro ShadColorEditor.sliderLabelStyle}
   final TextStyle? sliderLabelStyle;
+  /// {@macro ShadColorEditor.inputLabelStyle}
   final TextStyle? inputLabelStyle;
+  /// {@macro ShadColorEditor.inputStyle}
   final TextStyle? inputStyle;
+  /// {@macro ShadColorEditor.inputSuffixStyle}
   final TextStyle? inputSuffixStyle;
+  /// {@macro ShadColorEditor.inputDecoration}
   final ShadDecoration? inputDecoration;
+  /// {@macro ShadColorEditor.inputLabelPadding}
   final EdgeInsets? inputLabelPadding;
+  /// {@macro ShadColorEditor.sliderLabelPadding}
   final EdgeInsets? sliderLabelPadding;
+  /// {@macro ShadColorEditor.tabsTheme}
   final ShadTabsTheme? tabsTheme;
+  /// {@macro ShadColorEditor.sliderTheme}
   final ShadSliderTheme? sliderTheme;
+
+  /// {@macro ShadColorEditor.strings}
   final ShadColorEditorStringMap? strings;
 
   // Popover
@@ -164,11 +189,6 @@ class ShadColorPicker extends StatefulWidget {
 
   /// {@macro ShadButton.icon}
   final Widget? icon;
-
-  /// {@template ShadDatePicker.iconSrc}
-  /// The icon of the date picker button, defaults to [LucideIcons.calendar].
-  /// {@endtemplate}
-  final ShadImageSrc? iconSrc;
 
   /// {@macro ShadButton.child}
   final Widget? buttonChild;
@@ -336,6 +356,7 @@ class _ShadColorPickerState extends State<ShadColorPicker> {
     tabsTheme: widget.tabsTheme ?? const ShadTabsTheme(),
     sliderTheme: widget.sliderTheme ?? const ShadSliderTheme(),
     strings: widget.strings,
+    tabs: widget.tabs,
   );
 
   late final ShadPopoverTheme popoverThemeMerge = ShadPopoverTheme(
@@ -411,9 +432,7 @@ class _ShadColorPickerState extends State<ShadColorPicker> {
               ),
             ),
             child: ShadColorEditor(
-              tabs: widget.tabs,
               controller: controller,
-
             ),
           ),
         );

@@ -12,8 +12,8 @@ typedef ShadColorEditorStringMap = Map<ShadColorEditorStringKey, String>;
 class ShadColorEditor extends StatefulWidget {
   const ShadColorEditor({
     super.key,
-    required this.tabs,
     required this.controller,
+    this.tabs,
     this.onChanged,
     this.columnSpacing,
     this.rowSpacing,
@@ -32,25 +32,96 @@ class ShadColorEditor extends StatefulWidget {
     this.strings,
   });
 
-  final List<ShadColorEditorTab> tabs;
+  /// {@template ShadColorEditor.tabs}
+  /// The tabs to display in the editor.
+  /// A tab bar will only be displayed if there is more than one tab.
+  /// {@endtemplate}
+  final List<ShadColorEditorTab>? tabs;
+
+  /// The controller for the color editor.
   final ShadColorEditorController controller;
+
+  /// {@template ShadColorEditor.columnSpacing}
+  /// The spacing between widgets in the editor's columns.
+  /// {@endtemplate}
   final double? columnSpacing;
+
+  /// {@template ShadColorEditor.rowSpacing}
+  /// The spacing between widgets in the editor's rows,
+  /// excluding the main row. Used by the RGB and HSL input rows.
+  /// {@endtemplate}
   final double? rowSpacing;
+
+  /// {@template ShadColorEditor.mainRowSpacing}
+  /// The spacing between the main row and the sidebar.
+  /// Will only be used if a color area is displayed.
+  /// {@endtemplate}
   final double? mainRowSpacing;
+
+  /// {@template ShadColorEditor.tabsPadding}
+  /// The padding around the tabs bar.
+  /// {@endtemplate}
   final EdgeInsets? tabsPadding;
 
+  /// {@template ShadColorEditor.tabLabelStyle}
+  /// The style for the tab labels.
+  /// {@endtemplate}
   final TextStyle? tabLabelStyle;
+
+  /// {@template ShadColorEditor.sliderLabelStyle}
+  /// The style for the color slider labels.
+  /// {@endtemplate}
   final TextStyle? sliderLabelStyle;
+
+  /// {@template ShadColorEditor.inputLabelStyle}
+  /// The [TextStyle] for the color input field labels.
+  /// {@endtemplate}
   final TextStyle? inputLabelStyle;
+
+  /// {@template ShadColorEditor.inputStyle}
+  /// The [TextStyle] for the color input fields.
+  /// {@endtemplate}
   final TextStyle? inputStyle;
+
+  /// {@template ShadColorEditor.inputSuffixStyle}
+  /// The [TextStyle] for the color input field suffixes.
+  /// {@endtemplate}
   final TextStyle? inputSuffixStyle;
+
+  /// {@template ShadColorEditor.inputDecoration}
+  /// The [InputDecoration] for the color input fields.
+  /// {@endtemplate}
   final ShadDecoration? inputDecoration;
+
+  /// {@template ShadColorEditor.inputLabelPadding}
+  /// The padding around the color input field labels.
+  /// {@endtemplate}
   final EdgeInsets? inputLabelPadding;
+
+  /// {@template ShadColorEditor.sliderLabelPadding}
+  /// The padding around the color slider labels.
+  /// {@endtemplate}
   final EdgeInsets? sliderLabelPadding;
+
+  /// {@template ShadColorEditor.tabsTheme}
+  /// Theme overrides for the tab bar in the color picker.
+  /// Will be merged with the [ShadTabsTheme] of the current [ShadTheme].
+  /// {@endtemplate}
   final ShadTabsTheme? tabsTheme;
+
+  /// {@template ShadColorEditor.sliderTheme}
+  /// Theme overrides for the sliders in the color picker.
+  /// Will be merged with the [ShadSliderTheme] of the current [ShadTheme].
+  /// {@endtemplate}
   final ShadSliderTheme? sliderTheme;
+
+  /// {@template ShadColorEditor.strings}
+  /// The strings to use in the color editor.
+  /// Can be used to localize the editor.
+  /// {@endtemplate}
   final ShadColorEditorStringMap? strings;
 
+  /// Called when the color changes.
   final ValueChanged<Color>? onChanged;
 
   @override
@@ -63,6 +134,11 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
   @override
   Widget build(BuildContext context) {
     final theme = ShadTheme.of(context);
+
+    final effectiveTabs = widget.tabs ?? theme.colorEditorTheme.tabs ?? [];
+    if (controller.selected >= effectiveTabs.length) {
+      controller.selected = 0;
+    }
 
     final effectiveTabsPadding = widget.tabsPadding ??
         const EdgeInsets.only(
@@ -88,11 +164,11 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
           builder: (context, _) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (widget.tabs.length > 1)
+              if (effectiveTabs.length > 1)
                 Padding(
                   padding: effectiveTabsPadding,
                   child: ShadTabs<int>(
-                    tabs: widget.tabs
+                    tabs: effectiveTabs
                         .mapIndexed(
                           (i, e) => ShadTab(
                         value: i,
@@ -107,7 +183,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
                     controller: controller,
                   ),
                 ),
-              buildTab(widget.tabs[controller.selected]),
+              buildTab(effectiveTabs[controller.selected]),
             ],
           ),
         ),
@@ -119,7 +195,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
     final centerGap = widget.mainRowSpacing ?? 16;
     return IntrinsicHeight(
       child: switch (
-          tab.features.contains(ShadColorEditorFeature.colorPicker)) {
+          tab.features.contains(ShadColorEditorFeature.colorArea)) {
         true => Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -130,7 +206,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
                   padding: const EdgeInsets.only(left: 4, bottom: 4, top: 4),
                   child: AspectRatio(
                     aspectRatio: 1,
-                    child: ShadColorEditorColorField(
+                    child: ShadColorEditorColorArea(
                       controller: widget.controller,
                       onChanged: widget.onChanged,
                     ),
@@ -224,7 +300,7 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
     );
 
     switch (feat) {
-      case ShadColorEditorFeature.colorPicker:
+      case ShadColorEditorFeature.colorArea:
         throw UnimplementedError();
       case ShadColorEditorFeature.hueSlider:
         return ShadHSLComponentSlider(
@@ -438,7 +514,7 @@ class ShadColorEditorController extends ValueNotifier<HSLColor> {
 }
 
 enum ShadColorEditorFeature {
-  colorPicker(false, -1),
+  colorArea(false, -1),
   hueSlider(true, 1),
   saturationSlider(true, 2),
   luminanceSlider(true, 3),
@@ -497,8 +573,8 @@ class ShadColorEditorTab {
   final bool fixedGradient;
 }
 
-class ShadColorEditorColorField extends StatefulWidget {
-  const ShadColorEditorColorField({
+class ShadColorEditorColorArea extends StatefulWidget {
+  const ShadColorEditorColorArea({
     super.key,
     required this.controller,
     this.focusNode,
@@ -510,11 +586,11 @@ class ShadColorEditorColorField extends StatefulWidget {
   final ValueChanged<Color>? onChanged;
 
   @override
-  State<ShadColorEditorColorField> createState() =>
-      _ShadColorEditorColorFieldState();
+  State<ShadColorEditorColorArea> createState() =>
+      _ShadColorEditorColorAreaState();
 }
 
-class _ShadColorEditorColorFieldState extends State<ShadColorEditorColorField> {
+class _ShadColorEditorColorAreaState extends State<ShadColorEditorColorArea> {
   double x = 0;
   double y = 0;
   double hue = 0;

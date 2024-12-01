@@ -22,25 +22,43 @@ class ShadColorEditorTheme {
     this.tabsTheme = const ShadTabsTheme(),
     this.sliderTheme = const ShadSliderTheme(),
     this.strings,
+    this.tabs,
   });
 
   final bool merge;
-  final double? columnSpacing;
-  final double? rowSpacing;
-  final double? mainRowSpacing;
-  final EdgeInsets? tabsPadding;
-  final EdgeInsets? inputLabelPadding;
-  final EdgeInsets? sliderLabelPadding;
 
+  /// {@macro ShadColorEditor.columnSpacing}
+  final double? columnSpacing;
+  /// {@macro ShadColorEditor.rowSpacing}
+  final double? rowSpacing;
+  /// {@macro ShadColorEditor.mainRowSpacing}
+  final double? mainRowSpacing;
+  /// {@macro ShadColorEditor.tabsPadding}
+  final EdgeInsets? tabsPadding;
+  /// {@macro ShadColorEditor.inputLabelPadding}
+  final EdgeInsets? inputLabelPadding;
+  /// {@macro ShadColorEditor.sliderLabelPadding}
+  final EdgeInsets? sliderLabelPadding;
+  /// {@macro ShadColorEditor.tabLabelStyle}
   final TextStyle? tabLabelStyle;
+  /// {@macro ShadColorEditor.sliderLabelStyle}
   final TextStyle? sliderLabelStyle;
+  /// {@macro ShadColorEditor.inputLabelStyle}
   final TextStyle? inputLabelStyle;
+  /// {@macro ShadColorEditor.inputStyle}
   final TextStyle? inputStyle;
+  /// {@macro ShadColorEditor.inputSuffixStyle}
   final TextStyle? inputSuffixStyle;
+  /// {@macro ShadColorEditor.inputDecoration}
   final ShadDecoration? inputDecoration;
+  /// {@macro ShadColorEditor.tabsTheme}
   final ShadTabsTheme tabsTheme;
+  /// {@macro ShadColorEditor.sliderTheme}
   final ShadSliderTheme sliderTheme;
+  /// {@macro ShadColorEditor.strings}
   final ShadColorEditorStringMap? strings;
+  /// {@macro ShadColorEditor.tabs}
+  final List<ShadColorEditorTab>? tabs;
 
   static ShadColorEditorTheme lerp(
     ShadColorEditorTheme a,
@@ -69,6 +87,7 @@ class ShadColorEditorTheme {
       tabsTheme: ShadTabsTheme.lerp(a.tabsTheme, b.tabsTheme, t),
       sliderTheme: ShadSliderTheme.lerp(a.sliderTheme, b.sliderTheme, t),
       strings: t > 0.5 ? b.strings : a.strings,
+      tabs: t > 0.5 ? b.tabs : a.tabs,
     );
   }
 
@@ -94,6 +113,7 @@ class ShadColorEditorTheme {
         ...?strings,
         ...?other.strings,
       },
+      tabs: other.tabs,
     );
   }
 
@@ -114,6 +134,7 @@ class ShadColorEditorTheme {
     ShadTabsTheme? tabsTheme,
     ShadSliderTheme? sliderTheme,
     ShadColorEditorStringMap? strings,
+    List<ShadColorEditorTab>? tabs,
   }) {
     return ShadColorEditorTheme(
       merge: merge ?? this.merge,
@@ -132,6 +153,7 @@ class ShadColorEditorTheme {
       tabsTheme: tabsTheme ?? this.tabsTheme,
       sliderTheme: sliderTheme ?? this.sliderTheme,
       strings: strings ?? this.strings,
+      tabs: tabs ?? this.tabs,
     );
   }
 
@@ -155,7 +177,8 @@ class ShadColorEditorTheme {
           inputDecoration == other.inputDecoration &&
           tabsTheme == other.tabsTheme &&
           sliderTheme == other.sliderTheme &&
-          strings == other.strings;
+          strings == other.strings &&
+          tabs == other.tabs;
 
   @override
   int get hashCode =>
@@ -174,5 +197,6 @@ class ShadColorEditorTheme {
       inputDecoration.hashCode ^
       tabsTheme.hashCode ^
       sliderTheme.hashCode ^
-      strings.hashCode;
+      strings.hashCode ^
+      tabs.hashCode;
 }

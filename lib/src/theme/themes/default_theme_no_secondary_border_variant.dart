@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:shadcn_ui/src/components/button.dart';
+import 'package:shadcn_ui/src/components/color_editor.dart';
 import 'package:shadcn_ui/src/raw_components/portal.dart';
 import 'package:shadcn_ui/src/theme/color_scheme/base.dart';
 import 'package:shadcn_ui/src/theme/components/accordion.dart';
@@ -938,12 +939,24 @@ class ShadDefaultThemeNoSecondaryBorderVariant extends ShadThemeVariant {
       tabsPadding: const EdgeInsets.only(bottom: 8, left: 4, right: 4, top: 4),
       tabLabelStyle: effectiveTextTheme.small,
       inputStyle:
-          effectiveTextTheme.muted.copyWith(color: colorScheme.foreground),
+      effectiveTextTheme.muted.copyWith(color: colorScheme.foreground),
       inputLabelStyle: effectiveTextTheme.small,
       inputSuffixStyle: effectiveTextTheme.muted,
       sliderLabelStyle: effectiveTextTheme.small,
       inputLabelPadding: const EdgeInsets.only(left: 4),
       sliderLabelPadding: const EdgeInsets.only(left: 4),
+      tabs: const [
+        ShadColorEditorTab(
+          title: '',
+          features: {
+            ShadColorEditorFeature.colorArea,
+            ShadColorEditorFeature.hueSlider,
+            ShadColorEditorFeature.alphaSlider,
+            ShadColorEditorFeature.hexField,
+            ShadColorEditorFeature.rgbRow,
+          },
+        ),
+      ],
     );
   }
 

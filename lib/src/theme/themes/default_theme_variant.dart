@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:shadcn_ui/src/components/button.dart';
 import 'package:shadcn_ui/src/raw_components/portal.dart';
 import 'package:shadcn_ui/src/theme/color_scheme/base.dart';
@@ -903,6 +904,18 @@ class ShadDefaultThemeVariant extends ShadThemeVariant {
       sliderLabelStyle: effectiveTextTheme.small,
       inputLabelPadding: const EdgeInsets.only(left: 4),
       sliderLabelPadding: const EdgeInsets.only(left: 4),
+      tabs: const [
+        ShadColorEditorTab(
+          title: '',
+          features: {
+            ShadColorEditorFeature.colorArea,
+            ShadColorEditorFeature.hueSlider,
+            ShadColorEditorFeature.alphaSlider,
+            ShadColorEditorFeature.hexField,
+            ShadColorEditorFeature.rgbRow,
+          },
+        ),
+      ],
     );
   }
 

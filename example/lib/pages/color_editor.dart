@@ -24,7 +24,7 @@ class _ColorEditorPageState extends State<ColorEditorPage> {
             ShadColorEditorTab(
               title: 'HSL',
               features: {
-                ShadColorEditorFeature.colorPicker,
+                ShadColorEditorFeature.colorArea,
                 ShadColorEditorFeature.hueSlider,
                 ShadColorEditorFeature.saturationSlider,
                 ShadColorEditorFeature.luminanceSlider,
@@ -37,7 +37,7 @@ class _ColorEditorPageState extends State<ColorEditorPage> {
             ShadColorEditorTab(
               title: 'RGB',
               features: {
-                ShadColorEditorFeature.colorPicker,
+                ShadColorEditorFeature.colorArea,
                 ShadColorEditorFeature.hueSlider,
                 ShadColorEditorFeature.rgbSliders,
                 ShadColorEditorFeature.alphaSlider,
