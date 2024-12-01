@@ -159,32 +159,34 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
             widget.sliderTheme ?? theme.colorEditorTheme.sliderTheme,
           ),
         ),
-        child: ListenableBuilder(
-          listenable: controller,
-          builder: (context, _) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (effectiveTabs.length > 1)
-                Padding(
-                  padding: effectiveTabsPadding,
-                  child: ShadTabs<int>(
-                    tabs: effectiveTabs
-                        .mapIndexed(
-                          (i, e) => ShadTab(
-                        value: i,
-                        child: Text(
-                          e.title,
-                          style: widget.tabLabelStyle,
+        child: FocusTraversalGroup(
+          child: ListenableBuilder(
+            listenable: controller,
+            builder: (context, _) => Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (effectiveTabs.length > 1)
+                  Padding(
+                    padding: effectiveTabsPadding,
+                    child: ShadTabs<int>(
+                      tabs: effectiveTabs
+                          .mapIndexed(
+                            (i, e) => ShadTab(
+                          value: i,
+                          child: Text(
+                            e.title,
+                            style: widget.tabLabelStyle,
+                          ),
                         ),
-                      ),
-                    )
-                        .toList(),
-                    expandContent: false,
-                    controller: controller,
+                      )
+                          .toList(),
+                      expandContent: false,
+                      controller: controller,
+                    ),
                   ),
-                ),
-              buildTab(effectiveTabs[controller.selected]),
-            ],
+                buildTab(effectiveTabs[controller.selected]),
+              ],
+            ),
           ),
         ),
       ),
@@ -259,8 +261,10 @@ class _ShadColorEditorState extends State<ShadColorEditor> {
       children.add(buildFeature(tab, feature, theme));
     }
 
-    return Column(
-      children: children,
+    return FocusTraversalGroup(
+      child: Column(
+        children: children,
+      ),
     );
   }
 
