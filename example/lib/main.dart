@@ -23,6 +23,7 @@ import 'package:example/pages/resizable.dart';
 import 'package:example/pages/select.dart';
 import 'package:example/pages/select_form_field.dart';
 import 'package:example/pages/sheet.dart';
+import 'package:example/pages/sidebar.dart';
 import 'package:example/pages/slider.dart';
 import 'package:example/pages/switch.dart';
 import 'package:example/pages/switch_form_field.dart';
@@ -79,6 +80,7 @@ final routes = <String, WidgetBuilder>{
   '/toast': (_) => const ToastPage(),
   '/tooltip': (_) => const TooltipPage(),
   '/typography': (_) => const TypographyPage(),
+  '/sidebar': (_) => const SidebarPage(),
 };
 final routeToNameRegex = RegExp('(?:^/|-)([a-z])');
 

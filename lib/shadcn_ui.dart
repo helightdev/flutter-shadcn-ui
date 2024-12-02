@@ -40,6 +40,7 @@ export 'src/components/tabs.dart';
 export 'src/components/time_picker.dart';
 export 'src/components/toast.dart';
 export 'src/components/tooltip.dart';
+export 'src/components/sidebar.dart';
 
 // Raw Components
 export 'src/raw_components/portal.dart';

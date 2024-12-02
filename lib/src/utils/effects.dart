@@ -10,12 +10,15 @@ class SizeEffect extends Effect<double> {
     super.delay,
     super.duration,
     super.curve,
+    this.axis = Axis.vertical,
     double? begin,
     double? end,
   }) : super(
           begin: begin ?? (end == null ? defaultValue : neutralValue),
           end: end ?? neutralValue,
         );
+
+  final Axis axis;
 
   @override
   Widget build(
@@ -26,6 +29,7 @@ class SizeEffect extends Effect<double> {
   ) {
     return SizeTransition(
       sizeFactor: buildAnimation(controller, entry),
+      axis: axis,
       child: child,
     );
   }
